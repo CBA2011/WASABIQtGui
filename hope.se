@@ -1,0 +1,24 @@
+polygon_begin QUAD
+vertex 100 0 100 0.6
+vertex 100 100 100 1.0
+vertex -100 100 100 0.5
+vertex -100 0 100 0.1
+polygon_end
+polygon_begin QUAD
+vertex 100 0 -100 0.6
+vertex 100 100 -100 1.0
+vertex -100 100 -100 0.5
+vertex -100 0 -100 0.1
+polygon_end
+decayFunction LINEAR
+lifetime 10.0
+baseIntensity 0.0
+type HOPE
+tokens_begin OCC
+anticipation
+excitement
+expectancy
+hope
+hopeful
+looking_forward_to
+tokens_end

@@ -1,0 +1,14 @@
+polygon_begin QUAD
+vertex -100 100 -100 1.0
+vertex 0 100 -100 0
+vertex 0 -100 -100 0
+vertex -100 -100 -100 1.0
+polygon_end
+decayFunction LINEAR
+lifetime 10.0
+baseIntensity 0.0
+type FEARS-CONFIRMED
+tokens_begin OCC
+fears-confirmed
+worst_fears_realized
+tokens_end

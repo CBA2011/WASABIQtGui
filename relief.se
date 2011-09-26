@@ -1,0 +1,19 @@
+polygon_begin QUAD
+vertex 100 0 100 1.0
+vertex 100 50 100 1.0
+vertex -100 50 100 0.2
+vertex -100 0 100 0.2
+polygon_end
+polygon_begin QUAD
+vertex 100 0 -100 1.0
+vertex 100 50 -100 1.0
+vertex -100 50 -100 0.2
+vertex -100 0 -100 0.2
+polygon_end
+decayFunction LINEAR
+lifetime 10.0
+baseIntensity 0.0
+type RELIEF
+tokens_begin OCC
+relief
+tokens_end
