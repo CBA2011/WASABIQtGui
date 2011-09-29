@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>681</width>
-    <height>454</height>
+    <width>694</width>
+    <height>477</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="sizePolicy">
-     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
       <horstretch>0</horstretch>
       <verstretch>0</verstretch>
      </sizepolicy>
@@ -37,12 +37,18 @@
     </property>
     <property name="maximumSize">
      <size>
-      <width>681</width>
-      <height>321</height>
+      <width>700</width>
+      <height>350</height>
      </size>
     </property>
+    <property name="font">
+     <font>
+      <family>Nimbus Sans L</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tabEmoMood">
      <property name="sizePolicy">
@@ -74,8 +80,8 @@
            <rect>
             <x>10</x>
             <y>19</y>
-            <width>311</width>
-            <height>126</height>
+            <width>321</width>
+            <height>131</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_2">
@@ -303,7 +309,7 @@
             <x>10</x>
             <y>150</y>
             <width>311</width>
-            <height>101</height>
+            <height>131</height>
            </rect>
           </property>
           <property name="title">
@@ -315,7 +321,7 @@
              <x>10</x>
              <y>20</y>
              <width>301</width>
-             <height>74</height>
+             <height>95</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_3">
@@ -464,9 +470,9 @@
          <widget class="QWidget" name="gridLayoutWidget_4">
           <property name="geometry">
            <rect>
-            <x>9</x>
-            <y>19</y>
-            <width>344</width>
+            <x>0</x>
+            <y>20</y>
+            <width>331</width>
             <height>261</height>
            </rect>
           </property>
@@ -512,26 +518,31 @@
              </item>
             </layout>
            </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_12">
-             <property name="toolTip">
-              <string>Set the PAD values manually</string>
-             </property>
-             <property name="text">
-              <string>Override PAD</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
+           <item row="2" column="1">
             <layout class="QGridLayout" name="gridLayout_6">
              <property name="sizeConstraint">
               <enum>QLayout::SetDefaultConstraint</enum>
              </property>
              <item row="0" column="0">
               <widget class="QLabel" name="label_13">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>20</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>20</width>
+                 <height>16777215</height>
+                </size>
+               </property>
                <property name="text">
                 <string>P</string>
                </property>
@@ -540,37 +551,36 @@
                </property>
               </widget>
              </item>
-             <item row="0" column="1">
-              <widget class="QSlider" name="verticalSliderP">
-               <property name="minimum">
-                <number>-100</number>
-               </property>
-               <property name="maximum">
-                <number>100</number>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksBothSides</enum>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="2">
+             <item row="0" column="3">
               <spacer name="horizontalSpacer_10">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Preferred</enum>
+               </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>40</width>
-                 <height>20</height>
+                 <width>25</width>
+                 <height>15</height>
                 </size>
                </property>
               </spacer>
              </item>
-             <item row="0" column="3">
+             <item row="0" column="4">
               <widget class="QSlider" name="verticalSliderD">
+               <property name="minimumSize">
+                <size>
+                 <width>20</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>20</width>
+                 <height>16777215</height>
+                </size>
+               </property>
                <property name="minimum">
                 <number>-100</number>
                </property>
@@ -601,21 +611,20 @@
                </property>
               </spacer>
              </item>
-             <item row="1" column="1">
-              <widget class="QLabel" name="label_14">
-               <property name="text">
-                <string>A</string>
-               </property>
-               <property name="scaledContents">
-                <bool>false</bool>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="2">
+             <item row="1" column="3">
               <widget class="QSlider" name="horizontalSliderA">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>70</width>
+                 <height>0</height>
+                </size>
+               </property>
                <property name="minimum">
                 <number>-100</number>
                </property>
@@ -630,7 +639,7 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="3">
+             <item row="1" column="4">
               <widget class="QLabel" name="label_15">
                <property name="text">
                 <string>D</string>
@@ -643,7 +652,67 @@
                </property>
               </widget>
              </item>
+             <item row="0" column="1">
+              <widget class="QSlider" name="verticalSliderP">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>20</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>20</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="minimum">
+                <number>-100</number>
+               </property>
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="tickPosition">
+                <enum>QSlider::TicksBothSides</enum>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLabel" name="label_14">
+               <property name="text">
+                <string>A</string>
+               </property>
+               <property name="scaledContents">
+                <bool>false</bool>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
             </layout>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_12">
+             <property name="toolTip">
+              <string>Set the PAD values manually</string>
+             </property>
+             <property name="text">
+              <string>Override PAD</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -1028,7 +1097,7 @@
         <x>10</x>
         <y>10</y>
         <width>651</width>
-        <height>51</height>
+        <height>62</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_7">
@@ -1143,6 +1212,12 @@
          <height>30</height>
         </size>
        </property>
+       <property name="font">
+        <font>
+         <family>Nimbus Sans L</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>Attendee:</string>
        </property>
@@ -1168,6 +1243,12 @@
          <height>25</height>
         </size>
        </property>
+       <property name="font">
+        <font>
+         <family>Nimbus Sans L</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
        <property name="toolTip">
         <string>Select the EA displayed below</string>
        </property>
@@ -1192,6 +1273,12 @@
          <width>30</width>
          <height>25</height>
         </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>Nimbus Sans L</family>
+         <pointsize>10</pointsize>
+        </font>
        </property>
        <property name="toolTip">
         <string>Add a new EA</string>
@@ -1221,6 +1308,12 @@
          <height>25</height>
         </size>
        </property>
+       <property name="font">
+        <font>
+         <family>Nimbus Sans L</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
        <property name="toolTip">
         <string>(not implemented yet)</string>
        </property>
@@ -1242,6 +1335,12 @@
          <width>0</width>
          <height>30</height>
         </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>Nimbus Sans L</family>
+         <pointsize>10</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>PAD =</string>
@@ -1271,6 +1370,12 @@
          <height>25</height>
         </size>
        </property>
+       <property name="font">
+        <font>
+         <family>Nimbus Sans L</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
        <property name="verticalScrollBarPolicy">
         <enum>Qt::ScrollBarAlwaysOff</enum>
        </property>
@@ -1292,6 +1397,12 @@
          <width>0</width>
          <height>30</height>
         </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>Nimbus Sans L</family>
+         <pointsize>10</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>XYZ =</string>
@@ -1320,6 +1431,12 @@
          <width>125</width>
          <height>25</height>
         </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>Nimbus Sans L</family>
+         <pointsize>10</pointsize>
+        </font>
        </property>
        <property name="verticalScrollBarPolicy">
         <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -1358,6 +1475,12 @@
          <width>0</width>
          <height>30</height>
         </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>Nimbus Sans L</family>
+         <pointsize>10</pointsize>
+        </font>
        </property>
        <property name="toolTip">
         <string>Start/stop simulation</string>
@@ -1418,8 +1541,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>681</width>
-     <height>21</height>
+     <width>694</width>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuAbout">

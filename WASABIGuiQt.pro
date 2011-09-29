@@ -20,12 +20,6 @@ HEADERS  += \
 
 FORMS    += wasabiqtwindow.ui
 
-win32:CONFIG(release, debug|release):LIBS += -L$$PWD/../../WASABIEngine-build-desktop/release/ $$PWD/../../WASABIEngine-build-desktop/release/libWASABIEngine.a
-else:win32:CONFIG(debug, debug|release):LIBS += -L$$PWD/../../WASABIEngine-build-desktop/debug/ $$PWD/../../WASABIEngine-build-desktop/debug/libWASABIEngine.a
-
-INCLUDEPATH += $$PWD/../WASABIEngine
-DEPENDPATH += $$PWD/../WASABIEngine-build-desktop/debug
-
 OTHER_FILES += \
     WASABI.ini \
     relief.se \
@@ -38,23 +32,7 @@ OTHER_FILES += \
     README.txt
 
 
+unix:!symbian|win32: LIBS += -L$$PWD/../WASABIEngine/ -lWASABIEngine
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+INCLUDEPATH += $$PWD/../WASABIEngine
+DEPENDPATH += $$PWD/../WASABIEngine
