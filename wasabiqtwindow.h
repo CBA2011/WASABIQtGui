@@ -52,7 +52,6 @@ public:
     WASABIEngine* wasabi;
     bool serverAutoStart;
     bool startMinimized;
-    int MaxSimulations;
     std::string globalInitFilename;
     int getCurrentEA() {return currentEA;}
     AffectiveState* getHighlightedAffectiveState() {return highlighted_as;}
@@ -132,7 +131,9 @@ private:
     QUdpSocket *udpSocketReceiver;
     QUdpSocket *udpSocketSender;
     int sPort;
-    void networkMessage(QString m, bool parsed = false);
+    // prints a message with time and status into the "Network traffic" box.
+    // type: true = receive, false = transmit
+    void printNetworkMessage(QString m, bool type, bool success = false, bool parsed = false);
     bool parseMessage(QString data);
 };
 

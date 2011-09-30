@@ -76,8 +76,8 @@ WASABIQtWindow::WASABIQtWindow(QWidget *parent) :
     ui->setupUi(this);
     //setCentralWidget(ui->tabWidgetMain); // DON'T EVER DO THIS! Otherwise other parts are invisible!!!
     globalInitFilename = "WASABI.ini";
-    MaxSimulations = 10;
     wasabi = new WASABIEngine("secondary");
+    wasabi->setMaxSimulations(10);
     currentEA = 1;
     guiUpdate = 0;
     updateRate = 50;
@@ -87,11 +87,12 @@ WASABIQtWindow::WASABIQtWindow(QWidget *parent) :
     QDir dir;
     qDebug() << "Hello World " << dir.currentPath();
     sPort = 42424;
+
     if (!loadInitFile(sPort)) {
         qDebug() << "WASABIQtWindow::WASABIQtWindow: unable to load WASABI.ini or something went wrong!";
     }
     qDebug() << "WASABIQtWindow::WASABIQtWindow: serverPort is '" << sPort << "'";
-    wasabi->setMaxSimulations(MaxSimulations);
+
     // create the main gui window
     wasabi->initAllEAs();
     comboBoxAttendee_update();
@@ -294,10 +295,11 @@ bool WASABIQtWindow::loadInitFile(int& sPort) {
                             }
                             break;
                         case 5: //MaxSimulations
-                            MaxSimulations = 10;
+                            // TODO: Fix this thing!!!
+                            //MaxSimulations = 10;
                             number = atoi(word2.c_str());
                             if (number > 0 && number < 50) {
-                                MaxSimulations = number;
+                                //MaxSimulations = number;
                             }
                             break;
                         default:
@@ -509,7 +511,7 @@ void WASABIQtWindow::on_pushButtonAdd_clicked()
     if (!ok || globalID.isEmpty()) {
         return;
     }
-    int newLocalID = addEmotionalAttendee(name, globalID);
+    addEmotionalAttendee(name, globalID);
 }
 
 void WASABIQtWindow::on_comboBoxEmoAttendee_currentIndexChanged(const QString &arg1)
@@ -845,25 +847,37 @@ void WASABIQtWindow::processPendingDatagrams()
         std::cout << "Received datagram: [" << datagram.data() << "]" << std::endl;
         if (!ui->checkBoxReceiving->isChecked()) {
             std::cout << "WASABIQtWindow::processPendingDatagrams: 'Receiving' not checked, ignoring message" << std::endl;
-            networkMessage(datagram.data());
+            printNetworkMessage(datagram.data(), true, false, false);
             return;
         }
-        networkMessage(datagram.data(), true);
-        parseMessage(datagram.data());
+        printNetworkMessage(datagram.data(), true, parseMessage(datagram.data()), true);
     }
 }
 
-void WASABIQtWindow::networkMessage(QString message, bool parsed) {
-    QString p;
-    parsed ? p = "parsed" : p = "skipped";
-    ui->textEditNetworkTraffic->append(QString("(%0) %1 [%2]").arg(QTime::currentTime().toString()).arg(p).arg(message));
+void WASABIQtWindow::broadcastDatagram() {
+    //QByteArray datagram = "SenderID&IMPULSE&1&" + QByteArray::number(messageNo);
+    std::stringstream ostr;
+    wasabi->getEAfromID(currentEA)->EmoConPerson->writeTransferable(ostr);
+    QByteArray datagram = QByteArray(ostr.str().data(), ostr.str().size());
+    if (udpSocketSender->writeDatagram(datagram.data(), datagram.size(), QHostAddress::Broadcast, sPort) != -1) {
+        printNetworkMessage(datagram.data(), false, true);
+    }
+    else {
+        printNetworkMessage(datagram.data(), false, false);
+    }
 }
 
-void WASABIQtWindow::broadcastDatagram() {
-    int messageNo = 50;
-    QByteArray datagram = "SenderID&IMPULSE&1&" + QByteArray::number(messageNo);
-    udpSocketSender->writeDatagram(datagram.data(), datagram.size(),
-                                   QHostAddress::Broadcast, sPort);
+void WASABIQtWindow::printNetworkMessage(QString message, bool receive, bool success, bool parsed) {
+    QString p;
+    if (receive) {
+        p = "Receive (";
+        parsed ? p = p.append("parsed, ") : p.append("skipped, ");
+    }
+    else {
+        p = "Transmit (";
+    }
+    success ? p = p.append("success)") : p.append("failure)");
+    ui->textEditNetworkTraffic->append(QString("(%0) %1 [%2]").arg(QTime::currentTime().toString()).arg(p).arg(message));
 }
 
 void WASABIQtWindow::on_lineEditSenderPort_textEdited(const QString &arg1)
