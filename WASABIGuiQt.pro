@@ -32,7 +32,9 @@ OTHER_FILES += \
     README.txt
 
 
+
 unix:!symbian|win32: LIBS += -L$$PWD/../WASABIEngine/ -lWASABIEngine
+win32:!symbian|unix: LIBS += -L$$PWD/../WASABIEngine/debug -lWASABIEngine
 
 INCLUDEPATH += $$PWD/../WASABIEngine
 DEPENDPATH += $$PWD/../WASABIEngine
