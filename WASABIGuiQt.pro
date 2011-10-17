@@ -34,7 +34,8 @@ OTHER_FILES += \
 
 
 unix:!symbian|win32: LIBS += -L$$PWD/../WASABIEngine/ -lWASABIEngine
-win32:!symbian|unix: LIBS += -L$$PWD/../WASABIEngine/debug -lWASABIEngine
+win32:!symbian|unix: LIBS += -L$$PWD/../WASABIEngine/debug $$PWD/../WASABIEngine/debug/libWASABIEngine.a
 
 INCLUDEPATH += $$PWD/../WASABIEngine
-DEPENDPATH += $$PWD/../WASABIEngine
+unix:!symbian|win32: DEPENDPATH += $$PWD/../WASABIEngine
+win32:!symbian|unix: DEPENDPATH += $$PWD/../WASABIEngine/debug
