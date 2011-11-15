@@ -878,6 +878,16 @@ void WASABIQtWindow::printNetworkMessage(QString message, bool receive, bool suc
     }
     success ? p = p.append("success)") : p.append("failure)");
     ui->textEditNetworkTraffic->append(QString("(%0) %1 [%2]").arg(QTime::currentTime().toString()).arg(p).arg(message));
+    // HACK, please find a better place, perhaps we need to create an independent times (TODO)
+    std::string padString;
+    if (wasabi->getPADString(padString, currentEA)) {
+        myReplace(padString, "&", " ");
+    } else {
+        std::cerr << "WASABIQtWindow::printNetworkMessage: No padString found!" << std::endl;
+    }
+    ui->textEditOut->append(QString("(%0) %1: %2").arg(QTime::currentTime().toString())
+                            .arg(wasabi->getEAfromID(currentEA)->getName().c_str())
+                            .arg(padString.c_str()));
 }
 
 void WASABIQtWindow::on_lineEditSenderPort_textEdited(const QString &arg1)
