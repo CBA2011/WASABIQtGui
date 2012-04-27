@@ -36,6 +36,7 @@
 #include <QtGui>
 #include <QtNetwork>
 
+
 // some helpers from http://www.gammon.com.au/forum/bbshowpost.php?bbsubject_id=2896
 
 #define SPACES " \t\r\n"
@@ -855,6 +856,8 @@ void WASABIQtWindow::processPendingDatagrams()
 }
 
 void WASABIQtWindow::broadcastDatagram() {
+
+/*******
     //QByteArray datagram = "SenderID&IMPULSE&1&" + QByteArray::number(messageNo);
     std::stringstream ostr;
     wasabi->getEAfromID(currentEA)->EmoConPerson->writeTransferable(ostr);
@@ -865,6 +868,25 @@ void WASABIQtWindow::broadcastDatagram() {
     else {
         printNetworkMessage(datagram.data(), false, false);
     }
+********/
+    //EXTENSION1:
+    std::vector<cogaEmotionalAttendee*>::iterator iter_ea;
+    //const char* pEmoMlStr;
+    for (iter_ea = wasabi->emoAttendees.begin(); iter_ea != wasabi->emoAttendees.end(); ++iter_ea){
+        cogaEmotionalAttendee* ea = (*iter_ea);
+        EmoMLString = composeEmoML(ea);
+        //pEmoMlStr = EmoMLString.c_str();
+        QByteArray emoMlDatagram(EmoMLString.c_str());
+        //udpSocketSender->writeDatagram(emoMlDatagram.data(), emoMlDatagram.size(), QHostAddress::Broadcast, sPort);
+        if (udpSocketSender->writeDatagram(emoMlDatagram.data(), emoMlDatagram.size(), QHostAddress::Broadcast, sPort) != -1) {
+            printNetworkMessage(emoMlDatagram.data(), false, true);
+            ea->resetBuffer();
+        }
+        else {
+            printNetworkMessage(emoMlDatagram.data(), false, false);
+        }
+    }
+    //END OF EXTENSION1
 }
 
 void WASABIQtWindow::printNetworkMessage(QString message, bool receive, bool success, bool parsed) {
@@ -924,3 +946,16 @@ void WASABIQtWindow::actionAbout() {
     about->setTextFormat(Qt::RichText);
     about->show();
 }
+//EXTENSION2
+std::string
+WASABIQtWindow::composeEmoML(cogaEmotionalAttendee* ea)
+{
+std::string trace1, trace2, trace3 ,strUpdateRate,strEmoML;
+strUpdateRate = ea->intToString(updateRate);
+trace1 = ea->getPBuffer();
+trace2 = ea->getABuffer();
+trace3= ea-> getDBuffer();
+strEmoML = "<emotion dimension-set=\"http://www.w3.org/TR/emotion-voc/xml#pad-dimensions\"> <dimension name=\"pleasure\"> <trace freq=\"" + strUpdateRate + "Hz\" samples= \"" + trace1 + "\"/> </dimension> <dimension name=\"arousal\"> <trace freq=\"" + strUpdateRate + "Hz\" samples= \"" + trace2 + "\"/> </dimension> <dimension name=\"dominance\"> <trace freq=\"" + strUpdateRate + "Hz\" samples=\"" + trace3 + "\"/> </dimension> </emotion>";
+return strEmoML;
+}
+//END OF EXTENSION2

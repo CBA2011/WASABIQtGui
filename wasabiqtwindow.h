@@ -59,6 +59,10 @@ public:
     QTimer *timerSender;
     bool isRunning();
     bool showXYZ();
+    //EXTENSION1:
+    std::string composeEmoML(cogaEmotionalAttendee* ea);
+    std::string EmoMLString;
+    //END OF EXTENSION1
 
 public slots:
     void actionAbout();
