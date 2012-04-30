@@ -870,10 +870,12 @@ void WASABIQtWindow::broadcastDatagram() {
     }
 ********/
     //EXTENSION1:
+
     std::vector<cogaEmotionalAttendee*>::iterator iter_ea;
     //const char* pEmoMlStr;
     for (iter_ea = wasabi->emoAttendees.begin(); iter_ea != wasabi->emoAttendees.end(); ++iter_ea){
         cogaEmotionalAttendee* ea = (*iter_ea);
+
         EmoMLString = composeEmoML(ea);
         //pEmoMlStr = EmoMLString.c_str();
         QByteArray emoMlDatagram(EmoMLString.c_str());
@@ -950,12 +952,16 @@ void WASABIQtWindow::actionAbout() {
 std::string
 WASABIQtWindow::composeEmoML(cogaEmotionalAttendee* ea)
 {
-std::string trace1, trace2, trace3 ,strUpdateRate,strEmoML;
-strUpdateRate = ea->intToString(updateRate);
-trace1 = ea->getPBuffer();
-trace2 = ea->getABuffer();
-trace3= ea-> getDBuffer();
-strEmoML = "<emotion dimension-set=\"http://www.w3.org/TR/emotion-voc/xml#pad-dimensions\"> <dimension name=\"pleasure\"> <trace freq=\"" + strUpdateRate + "Hz\" samples= \"" + trace1 + "\"/> </dimension> <dimension name=\"arousal\"> <trace freq=\"" + strUpdateRate + "Hz\" samples= \"" + trace2 + "\"/> </dimension> <dimension name=\"dominance\"> <trace freq=\"" + strUpdateRate + "Hz\" samples=\"" + trace3 + "\"/> </dimension> </emotion>";
-return strEmoML;
+    if (ea) {
+        std::string trace1, trace2, trace3;
+        //strUpdateRate = ea->intToString(updateRate);
+        trace1 = ea->getPBuffer();
+        trace2 = ea->getABuffer();
+        trace3= ea-> getDBuffer();
+        std::stringstream ssEmoML;
+        ssEmoML << "<emotion dimension-set=\"http://www.w3.org/TR/emotion-voc/xml#pad-dimensions\"> <dimension name=\"pleasure\"> <trace freq=\"" << updateRate << "Hz\" samples= \"" << trace1 << "\"/> </dimension> <dimension name=\"arousal\"> <trace freq=\"" << updateRate << "Hz\" samples= \"" << trace2 << "\"/> </dimension> <dimension name=\"dominance\"> <trace freq=\"" << updateRate << "Hz\" samples=\"" << trace3 << "\"/> </dimension> </emotion>";
+        return ssEmoML.str();
+    }
+    return "Error";
 }
 //END OF EXTENSION2

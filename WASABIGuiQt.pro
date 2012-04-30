@@ -8,6 +8,11 @@ QT       += core gui opengl network
 
 TARGET = WASABIGuiQt
 TEMPLATE = app
+DEPENDPATH += . ../WASABIEngine
+INCLUDEPATH +=  ../WASABIEngine
+win32-g++:LIBS += -L"../WASABIEngine/debug"
+win32-g++:LIBS += -lWASABIEngine
+
 SOURCES += main.cpp\
         wasabiqtwindow.cpp \
     padwindow.cpp \
@@ -32,10 +37,3 @@ OTHER_FILES += \
     README.txt
 
 
-
-unix:!symbian|win32: LIBS += -L$$PWD/../WASABIEngine/ -lWASABIEngine
-win32:!symbian|unix: LIBS += -L$$PWD/../WASABIEngine/debug $$PWD/../WASABIEngine/debug/libWASABIEngine.a
-
-INCLUDEPATH += $$PWD/../WASABIEngine
-unix:!symbian|win32: DEPENDPATH += $$PWD/../WASABIEngine
-win32:!symbian|unix: DEPENDPATH += $$PWD/../WASABIEngine/debug
