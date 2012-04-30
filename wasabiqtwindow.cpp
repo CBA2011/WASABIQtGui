@@ -113,7 +113,7 @@ WASABIQtWindow::WASABIQtWindow(QWidget *parent) :
 
     ////// Server stuff from network/broadcastreceiver/receiver.cpp
     udpSocketReceiver = new QUdpSocket(this);
-    if (udpSocketReceiver->bind(sPort+1, QUdpSocket::ShareAddress)) {
+    if (udpSocketReceiver->bind(QHostAddress("192.168.56.1"), sPort+1)) {//, QUdpSocket::ShareAddress)) {
         std::cout << "The udpSocket receiving on port: " << sPort+1 << std::endl;
     }
     else {
@@ -896,7 +896,7 @@ void WASABIQtWindow::on_lineEditSenderPort_textEdited(const QString &arg1)
     int tmp = arg1.toInt(&ok);
     if (ok && tmp > 500 && tmp < 65536) {
         sPort = tmp;
-        udpSocketSender->bind(sPort);
+        udpSocketSender->bind(QHostAddress("192.168.56.101"), sPort);
     }
 }
 
