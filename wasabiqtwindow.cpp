@@ -114,18 +114,19 @@ WASABIQtWindow::WASABIQtWindow(QWidget *parent) :
 
     ////// Server stuff from network/broadcastreceiver/receiver.cpp
     udpSocketReceiver = new QUdpSocket(this);
-    if (udpSocketReceiver->bind(QHostAddress("192.168.56.1"), sPort+1)) {//, QUdpSocket::ShareAddress)) {
+    if (udpSocketReceiver->bind(sPort+1, QUdpSocket::ShareAddress)) {//
         std::cout << "The udpSocket receiving on port: " << sPort+1 << std::endl;
+
+        connect(udpSocketReceiver, SIGNAL(readyRead()),
+                this, SLOT(processPendingDatagrams()));
+
+        udpSocketSender = new QUdpSocket(this);
     }
     else {
         QMessageBox::critical(this, tr("Threaded WASABI Server"),
                               tr("Unable to start the server"));
     }
 
-    connect(udpSocketReceiver, SIGNAL(readyRead()),
-            this, SLOT(processPendingDatagrams()));
-
-    udpSocketSender = new QUdpSocket(this);
 
     QString str;
     str.setNum(sPort);
@@ -562,7 +563,7 @@ void WASABIQtWindow::on_spinBoxMass_valueChanged(int arg1)
 void WASABIQtWindow::on_spinBoxUpdateRate_valueChanged(int arg1)
 {
     if (arg1 > 0) {
-        updateRate = 1000/arg1;
+        updateRate = arg1;
         if (wasabi) {
             wasabi->setUpdateRate(ui->spinBoxUpdateRate->value(), currentEA);
         }
