@@ -12,6 +12,7 @@ DEPENDPATH += . ../WASABIEngine
 INCLUDEPATH +=  ../WASABIEngine
 win32-g++:LIBS += -L"../WASABIEngine/debug"
 win32-g++:LIBS += -lWASABIEngine
+unix:!symbian|win32: LIBS += -L$$PWD/../WASABIEngine/ -lWASABIEngine
 
 SOURCES += main.cpp\
         wasabiqtwindow.cpp \
