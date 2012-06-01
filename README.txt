@@ -13,9 +13,12 @@ under MS Windows 7. It depends on Qt, OpenGL, and the WASABIEngine as dynamicall
 The first two come with the Qt SDK, but the last one needs to be downloaded and compiled from GitHub separately.
 To compile the program yourself it might be easiest to download the free "Qt SDK" and then
 open the WASABIQtGUI.pro file.
+Then please _don't_ check the "shadow build" option, but take care that the compilations will stay in the same folder as the sources. In Win7 my current QtCreator (2.4.1) will create each a debug and a release subfolder automatically. In Linux (Ubuntu 11.10, QtCreator 2.2.1) this is, however, not the case and it seems that both compilations remain in the main folder of the project. Have to check this later..
+
 
 1b. Running
 As mentioned above, this project depends on the presence of the WASABIEngine library.
+
 For MS Windows environments, you may need to copy the "WASABIEngine.dll" from the corrsponding
 build-directory of that project, into the build project of this project (debug and/or release) manually.
 Furthermore, as it depends on your choice of options in QtCreator which directory structure will be
@@ -26,6 +29,8 @@ files to the same folder as the executable (debug and/or release again):
 - *.emo_pad
 - *.se
 These file(types) can be found in the source folder alongsight all the other sources.
+
+In case of a linux environment, I found that the "WASABIGuiQt" executable seems to expect the WASABIEngine library in "/usr/lib" (as the output of "ldd WASABIGuiQt" told me). Thus, after manually copying the library (together with the symbolic links, "sudo cp lib* /usr/lib") to that folder, the Gui runs fine. Sorry for this inconvenience. If anybody nows how to automate/fix this, please let me now.
 
 2. Documentation
 I used doxygen to compile an html documentation from the source code. It can be found in
