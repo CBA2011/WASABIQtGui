@@ -24,7 +24,7 @@
 ********************************************************************************/
 #ifndef WASABIQTWINDOW_H
 #define WASABIQTWINDOW_H
-#define CURRENT_VERSION 0.5
+#define CURRENT_VERSION 0.6
 
 #include <QMainWindow>
 #include "WASABIEngine.h"
@@ -118,6 +118,8 @@ private slots:
 
     void on_checkBoxSending_stateChanged(int arg1);
 
+    void on_pushButton_network_send_clicked();
+
 private:
     PADWindow *padWindow;
     Ui::WASABIQtWindow *ui;
@@ -139,6 +141,7 @@ private:
     // type: true = receive, false = transmit
     void printNetworkMessage(QString m, bool type, bool success = false, bool parsed = false);
     bool parseMessage(QString data);
+    QString *networkOutputFormat;
 };
 
 #endif // WASABIQTWINDOW_H

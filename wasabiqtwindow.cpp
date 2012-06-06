@@ -85,6 +85,7 @@ WASABIQtWindow::WASABIQtWindow(QWidget *parent) :
     updateRateSender = 1;
     serverAutoStart = false;
     startMinimized = false;
+    networkOutputFormat = new QString("default");
     QDir dir;
     qDebug() << "Hello World " << dir.currentPath();
     sPort = 42424;
@@ -211,6 +212,7 @@ bool WASABIQtWindow::loadInitFile(int& sPort) {
                         case 1: //EA: This starts a block of data for a specific EmotionalAttendee. Has to be terminated by \EA
                             // addEmotionalAttendee return 0 only in case of failure to create the new EmotionalAttendee
                             if (newLocalID = wasabi->addEmotionalAttendee(word2)) {
+                                qDebug() << "newLocalID assigned to " << QString(word2.c_str()) << " is " << newLocalID;
                                 // The EA was just initialized with "init.[dyn|pad]" files automatically
                                 while (std::getline(file, line) && trim(line) != "EA_END") { // We stop if a line starts with EA_END, see above
                                     line = trim(line);
@@ -701,10 +703,11 @@ void WASABIQtWindow::on_pushButtonTrigger_clicked()
 /** We expect messages (i.e. strings with a maximum length of 100 characters) that conform the following BNF:
  * <message>  ::= <senderID> '&' <command>
  * <senderID> ::= (any non-empty string)
- * <command>  ::= <add> | <trigger> | <impulse>
+ * <command>  ::= <add> | <trigger> | <impulse> | <dominance>
  * <add>      ::= 'ADD' '&' <name> [ '&' <initfile> '&' <globalID> ]
  * <trigger>  ::= 'TRIGGER' '&' <targetID> '&' <affectiveStateName> [ '&' <lifetime> ]
  * <impulse>  ::= 'IMPULSE' '&' <targetID> '&' <impvalue>
+ * <dominance>::= 'DOMINANCE' '&' <targetID> '&' <domvalue>
  * <name>     ::= (any non-empty string)
  * <initfile> ::= (any non-empty string, defaults to 'init', if not found)
  * <globalID> ::= (any non-empty string)
@@ -712,6 +715,7 @@ void WASABIQtWindow::on_pushButtonTrigger_clicked()
  * <affectiveStateName> ::= (any non-empty string, must match a name of an emotion, though)
  * <lifetime> ::= (any double d with 0 <= d <= 100 or d == -1)
  * <impvalue> ::= (any integer i with -100 <= i <= 100 and i != 0)
+ * <domvalue> ::= (any integer i with -100 <= i <= 100)
  * ------------------------------------------------------------------------------------------
  * ADD: Adds a new EmotionalAttendee (EA) to the simulation.
  *      For each EA an independent reference point (XYZ) is created
@@ -733,6 +737,9 @@ void WASABIQtWindow::on_pushButtonTrigger_clicked()
  *          Of course, the event can have happend to the agent/robot itself or to another person, i.e. another EmotionalAttendee (EA).
  *          In the former case, <targetID> should be set to '1', in the latter case, to that uid, which was returned after ADDing this EA to the simulation.
  *          The impulse must be within the range [-100,100] and should be an integer.
+ * DOMINANCE: Is used to set the dominance value of the EA with ID <targetID> to any value
+ *            between 100 (dominant) and -100 (submissive). As of June 2012 only the two extreme values make sense, though.
+ *            Concerning the value of <targetID> the same applies as in case of IMPULSE explained above.
  */
 bool WASABIQtWindow::parseMessage(QString message) {
     std::cout << "WASABIQtWindow::parseMessage: message = '" << message.toStdString() << "'" << std::endl;
@@ -760,7 +767,7 @@ bool WASABIQtWindow::parseMessage(QString message) {
         return false;
     }
     bool ok = false;
-    switch (returnIndex(command.toStdString(), "ADD TRIGGER IMPULSE")) {
+    switch (returnIndex(command.toStdString(), "ADD TRIGGER IMPULSE DOMINANCE")) {
     //<String senderID>|ADD|<String name==targetID>|<String globalID (optional)>
     //e.g. 'Robovie|ADD|Robovie|Robovie23' or 'Robovie1|ADD|Dylan F. Glas|120345_1' or simply 'Robovie|ADD|Chris'
     case 1:
@@ -832,9 +839,37 @@ bool WASABIQtWindow::parseMessage(QString message) {
         std::cout << "WASABIQtWindow::parseMessage: eaID = " << eaID << std::endl;
         return wasabi->emotionalImpulse(impulse, eaID);
         break;
+    case 4: //DOMINANCE <String targetID> <int impulse>
+        if (str_list.size()==3) {
+            std::cout << "WASABIQtWindow::parseMessage: not enough tokens for '"
+                      << command.toStdString() << "'!" << std::endl;
+            return false;
+        }
+        param1 = str_list.at(3);
+        impulse = param1.toInt(&ok); //atoi((const char*)param1.mb_str());
+        if (!ok || impulse < -100 || impulse > 100) {
+            std::cout
+                    << "WASABIQtWindow::parseMessage: second parameter (int impulse) of '"
+                    << command.toStdString()
+                    << "' is not in range [-100, 100] or 0 (or no integer at all)!"
+                    << std::endl;
+            return false;
+        }
+        eaID = targetID.toInt(&ok);//atoi((const char*)targetID.mb_str());
+        std::cout << "WASABIQtWindow::parseMessage: eaID = " << eaID << std::endl;
+        ea = wasabi->getEAfromID(eaID);
+        if (!ea) {
+            std::cerr << "WASABIQtWindow::parseMessage: unknown ea with ID '" << eaID
+                      << "'!" << std::endl;
+            return false;
+        }
+        ea->setDValue(impulse);
+        return true;
+        break;
     default:
-        std::cout << "WASABIQtWindow::parseMessage: unknown command '" << command.toStdString()
+        std::cerr << "WASABIQtWindow::parseMessage: unknown command '" << command.toStdString()
                   << "'!" << std::endl;
+        return false;
     }
     return true;
 }
@@ -921,7 +956,7 @@ void WASABIQtWindow::on_lineEditSenderPort_textEdited(const QString &arg1)
     int tmp = arg1.toInt(&ok);
     if (ok && tmp > 500 && tmp < 65536) {
         sPort = tmp;
-        udpSocketSender->bind(QHostAddress("192.168.56.101"), sPort);
+        udpSocketSender->bind(sPort);
     }
 }
 
@@ -945,7 +980,7 @@ void WASABIQtWindow::on_checkBoxSending_stateChanged(int arg1)
 
 void WASABIQtWindow::actionAbout() {
     QMessageBox* about;
-    about = new QMessageBox(QMessageBox::Information, "About WASABIQtGUI", QString("<p>Copyright (C) 2011 Christian Becker-Asano. <br>All rights reserved.<br>Contact: Christian Becker-Asano (christian@becker-asano.de)</p>This is version %0 of the Qt-based Graphical User Interface (GUI) WASABIQtGUI, which depends on the shared library WASABIEngine to run the WASABI Affect Simulation Architecture as described in the doctoral thesis of Christian Becker-Asano. It is licensed under the LGPL and its source can be obtained freely via GitHub.<p>For further information, please visit:<br> <a href='https://www.becker-asano.de/index.php/wasabi'>https://www.becker-asano.de/index.php/wasabi</a></p>").arg(CURRENT_VERSION), QMessageBox::Ok);
+    about = new QMessageBox(QMessageBox::Information, "About WASABIQtGUI", QString("<p>Copyright (C) 2011 Christian Becker-Asano. <br>All rights reserved.<br>Contact: Christian Becker-Asano (christian@becker-asano.de)</p>This is version %0 of the Qt-based Graphical User Interface (GUI) WASABIQtGUI, which depends on the shared library WASABIEngine to run the WASABI Affect Simulation Architecture as described in the doctoral thesis of Christian Becker-Asano. It is licensed under the LGPL and its source can be obtained freely via GitHub.<p>For further information, please visit:<br> <a href='https://www.becker-asano.de/index.php/component/search/?searchword=WASABI'>https://www.becker-asano.de/index.php/component/search/?searchword=WASABI</a></p>").arg(CURRENT_VERSION), QMessageBox::Ok);
     about->setTextFormat(Qt::RichText);
     about->show();
 }
@@ -966,3 +1001,21 @@ WASABIQtWindow::composeEmoML(cogaEmotionalAttendee* ea)
     return "Error";
 }
 //END OF EXTENSION2
+
+void WASABIQtWindow::on_pushButton_network_send_clicked()
+{
+    if (ui->lineEdit_network_send->text().isEmpty())
+        return;
+    QByteArray datagram;
+    datagram.append(ui->lineEdit_network_send->text());
+    int port = (ui->lineEditReceiverPort->text()).toInt();
+    std::cout << "Sending to port " << port;
+    //udpSocketSender->setPeerPort((ui->lineEditReceiverPort->text()).toInt());
+    if (udpSocketSender->writeDatagram(datagram.data(), datagram.size(), QHostAddress::Broadcast, port) != -1) {
+        printNetworkMessage(datagram.data(), false, true);
+    }
+    else {
+        printNetworkMessage(datagram.data(), false, false);
+    }
+    std::cout << " done!" << std::endl;
+}

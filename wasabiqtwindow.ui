@@ -48,7 +48,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tabEmoMood">
      <property name="sizePolicy">
@@ -81,7 +81,7 @@
             <x>10</x>
             <y>19</y>
             <width>321</width>
-            <height>131</height>
+            <height>136</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_2">
@@ -1071,7 +1071,7 @@
         <x>10</x>
         <y>70</y>
         <width>651</width>
-        <height>221</height>
+        <height>181</height>
        </rect>
       </property>
       <property name="title">
@@ -1083,7 +1083,7 @@
          <x>10</x>
          <y>20</y>
          <width>631</width>
-         <height>191</height>
+         <height>151</height>
         </rect>
        </property>
        <property name="readOnly">
@@ -1178,6 +1178,32 @@
          </property>
          <property name="maximum">
           <number>50</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_3">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>250</y>
+        <width>651</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QPushButton" name="pushButton_network_send">
+         <property name="text">
+          <string>Send</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_network_send">
+         <property name="text">
+          <string>JohnDoe&amp;DOMINANCE&amp;1&amp;-100</string>
          </property>
         </widget>
        </item>
@@ -1501,7 +1527,7 @@
       <x>0</x>
       <y>350</y>
       <width>681</width>
-      <height>61</height>
+      <height>81</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -1542,7 +1568,7 @@
      <x>0</x>
      <y>0</y>
      <width>694</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuAbout">
@@ -1551,12 +1577,45 @@
     </property>
     <addaction name="actionAbout"/>
    </widget>
+   <widget class="QMenu" name="menuNetworkMode">
+    <property name="title">
+     <string>NetworkMode</string>
+    </property>
+    <addaction name="actionSendAffectLikelihoods"/>
+    <addaction name="actionSendPADtrace"/>
+    <addaction name="actionSendPADvalues"/>
+   </widget>
    <addaction name="menuAbout"/>
+   <addaction name="menuNetworkMode"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionSendAffectLikelihoods">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>SendAffectLikelihoods</string>
+   </property>
+  </action>
+  <action name="actionSendPADtrace">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>SendPADtrace</string>
+   </property>
+  </action>
+  <action name="actionSendPADvalues">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>SendPADvalues</string>
    </property>
   </action>
  </widget>
