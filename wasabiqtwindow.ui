@@ -1069,9 +1069,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>70</y>
+        <y>100</y>
         <width>651</width>
-        <height>181</height>
+        <height>151</height>
        </rect>
       </property>
       <property name="title">
@@ -1095,9 +1095,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>10</y>
+        <y>7</y>
         <width>651</width>
-        <height>62</height>
+        <height>81</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_7">
@@ -1180,6 +1180,41 @@
           <number>50</number>
          </property>
         </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_29">
+         <property name="text">
+          <string>SenderMode:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QCheckBox" name="checkBox_senderMode_AL">
+           <property name="text">
+            <string>Affect likelihoods</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="checkBox_senderMode_PAD">
+           <property name="text">
+            <string>PAD values</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="checkBox_senderMode_PADtrace">
+           <property name="text">
+            <string>PAD traces</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>

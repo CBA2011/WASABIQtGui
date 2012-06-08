@@ -892,7 +892,25 @@ void WASABIQtWindow::processPendingDatagrams()
 }
 
 void WASABIQtWindow::broadcastDatagram() {
+    std::string padString;
+    if (wasabi->getPADString(padString, currentEA)) {
+        myReplace(padString, "&", " ");
+    } else {
+        std::cerr << "WASABIQtWindow::printNetworkMessage: No padString found!" << std::endl;
+    }
 
+    ui->textEditOut->append(QString("(%0) %1: %2").arg(QTime::currentTime().toString())
+                            .arg(wasabi->getEAfromID(currentEA)->getName().c_str())
+                            .arg(padString.c_str()));
+    if (ui->checkBox_senderMode_AL->isChecked()) {
+        QByteArray datagram(padString.c_str());
+        if (udpSocketSender->writeDatagram(datagram.data(), datagram.size(), QHostAddress::Broadcast, sPort) != -1) {
+            printNetworkMessage(datagram.data(), false, true);
+        }
+        else {
+            printNetworkMessage(datagram.data(), false, false);
+        }
+    }
 /*******
     //QByteArray datagram = "SenderID&IMPULSE&1&" + QByteArray::number(messageNo);
     std::stringstream ostr;
@@ -907,21 +925,23 @@ void WASABIQtWindow::broadcastDatagram() {
 ********/
     //EXTENSION1:
 
-    std::vector<cogaEmotionalAttendee*>::iterator iter_ea;
-    //const char* pEmoMlStr;
-    for (iter_ea = wasabi->emoAttendees.begin(); iter_ea != wasabi->emoAttendees.end(); ++iter_ea){
-        cogaEmotionalAttendee* ea = (*iter_ea);
+    if (ui->checkBox_senderMode_PADtrace->isChecked()) {
+        std::vector<cogaEmotionalAttendee*>::iterator iter_ea;
+        //const char* pEmoMlStr;
+        for (iter_ea = wasabi->emoAttendees.begin(); iter_ea != wasabi->emoAttendees.end(); ++iter_ea){
+            cogaEmotionalAttendee* ea = (*iter_ea);
 
-        EmoMLString = composeEmoML(ea);
-        //pEmoMlStr = EmoMLString.c_str();
-        QByteArray emoMlDatagram(EmoMLString.c_str());
-        //udpSocketSender->writeDatagram(emoMlDatagram.data(), emoMlDatagram.size(), QHostAddress::Broadcast, sPort);
-        if (udpSocketSender->writeDatagram(emoMlDatagram.data(), emoMlDatagram.size(), QHostAddress::Broadcast, sPort) != -1) {
-            printNetworkMessage(emoMlDatagram.data(), false, true);
-            ea->resetBuffer();
-        }
-        else {
-            printNetworkMessage(emoMlDatagram.data(), false, false);
+            EmoMLString = composeEmoML(ea);
+            //pEmoMlStr = EmoMLString.c_str();
+            QByteArray emoMlDatagram(EmoMLString.c_str());
+            //udpSocketSender->writeDatagram(emoMlDatagram.data(), emoMlDatagram.size(), QHostAddress::Broadcast, sPort);
+            if (udpSocketSender->writeDatagram(emoMlDatagram.data(), emoMlDatagram.size(), QHostAddress::Broadcast, sPort) != -1) {
+                printNetworkMessage(emoMlDatagram.data(), false, true);
+                ea->resetBuffer();
+            }
+            else {
+                printNetworkMessage(emoMlDatagram.data(), false, false);
+            }
         }
     }
     //END OF EXTENSION1
@@ -939,15 +959,6 @@ void WASABIQtWindow::printNetworkMessage(QString message, bool receive, bool suc
     success ? p = p.append("success)") : p.append("failure)");
     ui->textEditNetworkTraffic->append(QString("(%0) %1 [%2]").arg(QTime::currentTime().toString()).arg(p).arg(message));
     // HACK, please find a better place, perhaps we need to create an independent times (TODO)
-    std::string padString;
-    if (wasabi->getPADString(padString, currentEA)) {
-        myReplace(padString, "&", " ");
-    } else {
-        std::cerr << "WASABIQtWindow::printNetworkMessage: No padString found!" << std::endl;
-    }
-    ui->textEditOut->append(QString("(%0) %1: %2").arg(QTime::currentTime().toString())
-                            .arg(wasabi->getEAfromID(currentEA)->getName().c_str())
-                            .arg(padString.c_str()));
 }
 
 void WASABIQtWindow::on_lineEditSenderPort_textEdited(const QString &arg1)
