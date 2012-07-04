@@ -5,4 +5,4 @@ mass 5000 # mass of the point of reference
 xReg 5 # x-region for boredom
 yReg 5 # y-region for boredom
 boredom 50 # time-factor for boredom
-prevalence 50 # prevalence for the mood
+prevalence 0 # prevalence for the mood
