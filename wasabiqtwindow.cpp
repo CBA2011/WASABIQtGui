@@ -478,6 +478,15 @@ int WASABIQtWindow::addEmotionalAttendee(const QString& name, const QString& glo
     int newLocalID = wasabi->addEmotionalAttendee(name.toStdString(), globalID.toStdString());
     if (newLocalID != 0 && wasabi->initEA(wasabi->getEAfromID(newLocalID))){
         comboBoxAttendee_update();
+
+
+        currentEA = newLocalID;
+        cogaEmotionalAttendee* ea = wasabi->getEAfromID(currentEA);
+        if (ea) {
+            initValues(ea);
+            ui->statusBar->showMessage(QString("Attendee %0 initialized").arg(ea->getName().c_str()), 1000);
+        }
+
         return newLocalID;
     }
     std::cout << "myGuiFrame::addEmotionalAttendee: ERROR could not create new EA!" << std::endl;
