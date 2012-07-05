@@ -78,7 +78,7 @@ WASABIQtWindow::WASABIQtWindow(QWidget *parent) :
     //setCentralWidget(ui->tabWidgetMain); // DON'T EVER DO THIS! Otherwise other parts are invisible!!!
     globalInitFilename = "WASABI.ini";
     wasabi = new WASABIEngine("secondary");
-    wasabi->setMaxSimulations(10);
+    wasabi->setMaxSimulations(50);
     currentEA = 1;
     guiUpdate = 0;
     updateRate = 50;
@@ -713,7 +713,7 @@ void WASABIQtWindow::on_pushButtonTrigger_clicked()
  * <message>  ::= <senderID> '&' <command>
  * <senderID> ::= (any non-empty string)
  * <command>  ::= <add> | <trigger> | <impulse> | <dominance>
- * <add>      ::= 'ADD' '&' <name> [ '&' <initfile> '&' <globalID> ]
+ * <add>      ::= 'ADD' '&' <name> [ '&' <globalID> '&' <initfile> ]
  * <trigger>  ::= 'TRIGGER' '&' <targetID> '&' <affectiveStateName> [ '&' <lifetime> ]
  * <impulse>  ::= 'IMPULSE' '&' <targetID> '&' <impvalue>
  * <dominance>::= 'DOMINANCE' '&' <targetID> '&' <domvalue>
@@ -783,9 +783,32 @@ bool WASABIQtWindow::parseMessage(QString message) {
         if (str_list.size() == 3) {
             newLocalID = addEmotionalAttendee(targetID, "undef"); // targetID is the 'real name' here, e.g. 'Dylan F. Glas'
         }
-        else {
+        else if (str_list.size() == 4){
             param1 = str_list.at(3); // <String globalID>
             newLocalID = addEmotionalAttendee(targetID, param1); // param1 is the globalID here, e.g. '120345_1'
+        }
+        else if (str_list.size() == 5){
+            param1 = str_list.at(3); // <String globalID>
+            param2 = str_list.at(4); // <String globalID>
+            newLocalID = addEmotionalAttendee(targetID, param1); // param1 is the globalID here, e.g. '120345_1'
+
+            QString param3 = param2.append(".emo_dyn");
+            param2 = param2.append(".emo_pad");
+
+            std::string dyn = param3.toStdString();
+            std::string pad = param2.toStdString();
+
+            if (ea = wasabi->getEAfromID(newLocalID)) {
+                ea->EmoConPerson->dynFilename = dyn;
+                ea->EmoConPerson->padFilename = pad;
+                wasabi->initEA(ea);
+            } else {
+                qDebug()
+                        << "MyApp::loadInitFile(): ERROR no ea with ID "
+                        << newLocalID
+                        << " found!"
+                           ;
+            }
         }
         if (newLocalID == 0) {
             return false;
