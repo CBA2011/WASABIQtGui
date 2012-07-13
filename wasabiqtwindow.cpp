@@ -1038,7 +1038,7 @@ WASABIQtWindow::composeEmoML(cogaEmotionalAttendee* ea)
         trace2 = ea->getABuffer();
         trace3= ea-> getDBuffer();
         std::stringstream ssEmoML;
-        ssEmoML << "<emotion dimension-set=\"http://www.w3.org/TR/emotion-voc/xml#pad-dimensions\"> <dimension name=\"pleasure\"> <trace freq=\"" << updateRate << "Hz\" samples= \"" << trace1 << "\"/> </dimension> <dimension name=\"arousal\"> <trace freq=\"" << updateRate << "Hz\" samples= \"" << trace2 << "\"/> </dimension> <dimension name=\"dominance\"> <trace freq=\"" << updateRate << "Hz\" samples=\"" << trace3 << "\"/> </dimension> </emotion>";
+        ssEmoML << "<emotionml version=\"1.0\" xmlns=\"http://www.w3.org/2009/10/emotionml\"> <emotion dimension-set=\"http://www.w3.org/TR/emotion-voc/xml#pad-dimensions\"> <dimension name=\"pleasure\"> <trace freq=\"" << updateRate << "Hz\" samples= \"" << trace1 << "\"/> </dimension> <dimension name=\"arousal\"> <trace freq=\"" << updateRate << "Hz\" samples= \"" << trace2 << "\"/> </dimension> <dimension name=\"dominance\"> <trace freq=\"" << updateRate << "Hz\" samples=\"" << trace3 << "\"/> </dimension> </emotion> </emotionml>";
         return ssEmoML.str();
     }
     return "Error";
