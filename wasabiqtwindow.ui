@@ -48,7 +48,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tabEmoMood">
      <property name="sizePolicy">
@@ -1244,11 +1244,6 @@
        </item>
       </layout>
      </widget>
-    </widget>
-    <widget class="QWidget" name="tab">
-     <attribute name="title">
-      <string>Plotter</string>
-     </attribute>
     </widget>
    </widget>
    <widget class="QWidget" name="layoutWidget">

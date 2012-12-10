@@ -39,6 +39,7 @@ namespace Ui {
 
 class PADWindow;
 class QUdpSocket;
+class WASABIqwtPlotter;
 
 class WASABIQtWindow : public QMainWindow
 {
@@ -122,6 +123,7 @@ private slots:
 
 private:
     PADWindow *padWindow;
+    WASABIqwtPlotter *qwtPlotterWindow;
     Ui::WASABIQtWindow *ui;
     void comboBoxAttendee_update();
     void initValues(cogaEmotionalAttendee* ea);

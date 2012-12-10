@@ -10,8 +10,11 @@ TARGET = WASABIGuiQt
 TEMPLATE = app
 DEPENDPATH += . ../WASABIEngine
 INCLUDEPATH +=  ../WASABIEngine
+INCLUDEPATH +=  3rdparty/src
 win32-g++:LIBS += -L"../WASABIEngine/debug"
 win32-g++:LIBS += -lWASABIEngine
+win32-g++:LIBS += -L"./3rdparty/lib"
+win32-g++:LIBS += -lqwt
 unix:!symbian|win32: LIBS += -L$$PWD/../WASABIEngine/ -lWASABIEngine
 
 SOURCES += main.cpp\
