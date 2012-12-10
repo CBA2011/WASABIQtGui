@@ -14,7 +14,7 @@
    <string>WASABIQtWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QTabWidget" name="tabWidgetMain">
+   <widget class="QTabWidget" name="tabPlotter">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -48,7 +48,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="tabEmoMood">
      <property name="sizePolicy">
@@ -1245,6 +1245,11 @@
       </layout>
      </widget>
     </widget>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>Plotter</string>
+     </attribute>
+    </widget>
    </widget>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
@@ -1603,7 +1608,7 @@
      <x>0</x>
      <y>0</y>
      <width>694</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuAbout">

@@ -17,12 +17,14 @@ unix:!symbian|win32: LIBS += -L$$PWD/../WASABIEngine/ -lWASABIEngine
 SOURCES += main.cpp\
         wasabiqtwindow.cpp \
     padwindow.cpp \
-    glPADWidget.cpp
+    glPADWidget.cpp \
+    wasabiqwtplotter.cpp
 
 HEADERS  += \
     padwindow.h \
     glPADWidget.h \
-    wasabiqtwindow.h
+    wasabiqtwindow.h \
+    wasabiqwtplotter.h
 
 FORMS    += wasabiqtwindow.ui
 

@@ -25,6 +25,7 @@
 #include "wasabiqtwindow.h"
 #include "ui_wasabiqtwindow.h"
 #include "padwindow.h"
+#include "wasabiqwtplotter.h"
 #include "PrimaryEmotion.h"
 #include "SecondaryEmotion.h"
 #include <sstream>
