@@ -106,11 +106,6 @@ WASABIQtWindow::WASABIQtWindow(QWidget *parent) :
     padWindow->resize(padWindow->sizeHint());
     padWindow->show();
 
-    // Create the qwt-based plotter window
-    qwtPlotterWindow = new WASABIqwtPlotter(this);
-    qwtPlotterWindow->resize(qwtPlotterWindow->sizeHint());
-    qwtPlotterWindow->show();
-
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
     timer->start(1000/updateRate); // 50Hz

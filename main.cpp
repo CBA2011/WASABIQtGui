@@ -22,14 +22,19 @@
 ** along with the WASABIQtGui program.  If not, see <http://www.gnu.org/licenses/>
 **
 ********************************************************************************/
-#include <QtGui/QApplication>
+#include <qapplication.h>
 #include "wasabiqtwindow.h"
+#include "wasabiqwtplotter.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     WASABIQtWindow w;
     w.show();
+    // Create the qwt-based plotter window
+    WASABIqwtPlotter* qwtPlotterWindow = new WASABIqwtPlotter(&w, w.wasabi);
+    qwtPlotterWindow->resize(qwtPlotterWindow->sizeHint());
+    qwtPlotterWindow->show();
 
     return a.exec();
 }

@@ -228,7 +228,7 @@ void GLPADWidget::paintGL()
 
     glFlush();
 
-    QGLWidget::swapBuffers();
+    //QGLWidget::swapBuffers();
 }
 
 void GLPADWidget::resizeGL( int width, int height)
