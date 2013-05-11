@@ -1,19 +1,21 @@
 Freiburg, 26th of September, 2011
+UPDATE: 10th of May, 2013 
 
 [W]ASABI [A]ffect [S]imulation [A]rchitecture for [B]elievable [I]nteractivity
-GUI part version 0.5
+GUI part version 0.7
 Copyright (C) 2011 Christian Becker-Asano.
 All rights reserved.
 
 Contact: Christian Becker-Asano (christian (at) becker-asano (dot) de)
 
 1a. Compiling
-This program can be compiled as using "Qt Creator" version 2.3.0 (MinGW4.4, Qt4.7.3)
-under MS Windows 7. It depends on Qt, OpenGL, and the WASABIEngine as dynamically linked libraries.
-The first two come with the Qt SDK, but the last one needs to be downloaded and compiled from GitHub separately.
-To compile the program yourself it might be easiest to download the free "Qt SDK" and then
-open the WASABIQtGUI.pro file.
-Then please _don't_ check the "shadow build" option, but take care that the compilations will stay in the same folder as the sources. In Win7 my current QtCreator (2.4.1) will create each a debug and a release subfolder automatically. In Linux (Ubuntu 11.10, QtCreator 2.2.1) this is, however, not the case and it seems that both compilations remain in the main folder of the project. Have to check this later..
+This program can be compiled as using "Qt Creator" version 2.4.1 (MinGW4.6.2, Qt4.7.4) under MS Windows 7. It depends on Qt, OpenGL, QWT (http://qwt.sourceforge.net/), and the WASABIEngine as dynamically linked libraries.
+The first two come with the Qt SDK. The third one is available in the "3rdparty" subdirectory and must be compiled using QtCreator once before used by this project. The last one needs to be downloaded and compiled from GitHub separately.
+To compile the program please follow these steps:
+1. open the file "3rdparty/qwt.pro" in QtCreator and compile with the following settings:
+- 
+yourself it might be easiest to download the free "Qt SDK" and then open the WASABIQtGUI.pro file.
+Then please _don't_ check the "shadow build" option, but take care that the compilations will stay in the same folder as the sources. In Win7 my current QtCreator (2.4.1) will create each a debug and a release subfolder automatically. As of September 2011, in Linux (Ubuntu 11.10, QtCreator 2.2.1) this is, however, not the case and it seems that both compilations remain in the main folder of the project. Still needs to be checked later..
 
 
 1b. Running

@@ -8,6 +8,7 @@ QT       += core gui opengl network
 
 TARGET = WASABIGuiQt
 TEMPLATE = app
+
 DEPENDPATH += . ../WASABIEngine
 INCLUDEPATH +=  ../WASABIEngine
 INCLUDEPATH +=  3rdparty/src

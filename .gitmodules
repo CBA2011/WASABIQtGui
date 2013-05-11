@@ -1,0 +1,3 @@
+[submodule "WASABIEngine"]
+	path = WASABIEngine
+	url = https://github.com/CBA2011/WASABIEngine.git
