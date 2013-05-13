@@ -6,7 +6,7 @@
 #include <qwt_scale_draw.h>
 #include <qwt_scale_widget.h>
 #include <qwt_legend.h>
-#include <qwt_legend_item.h>
+#include <qwt_legend_label.h>
 #include <qwt_plot_canvas.h>
 // for CpuStat
 #include <qstringlist.h>
@@ -132,12 +132,15 @@ PADPlot::PADPlot( QWidget *parent ):
 {
     setAutoReplot( false );
 
-    canvas()->setBorderRadius( 10 );
+    QwtPlotCanvas *canvas = new QwtPlotCanvas();
+    canvas->setBorderRadius( 10 );
+
+    setCanvas( canvas );
 
     plotLayout()->setAlignCanvasToScales( true );
 
     QwtLegend *legend = new QwtLegend;
-    legend->setItemMode( QwtLegend::CheckableItem );
+    legend->setDefaultItemMode( QwtLegendData::Checkable );
     insertLegend( legend, QwtPlot::RightLegend );
 
     setAxisTitle( QwtPlot::xBottom, " System Uptime [h:m:s]" );
@@ -251,11 +254,19 @@ void PADPlot::showCurve( QwtPlotItem *item, bool on )
 {
     item->setVisible( on );
 
-    QwtLegendItem *legendItem =
-        qobject_cast<QwtLegendItem *>( legend()->find( item ) );
+    QwtLegend *lgd = qobject_cast<QwtLegend *>( legend() );
 
-    if ( legendItem )
-        legendItem->setChecked( on );
+    QList<QWidget *> legendWidgets =
+        lgd->legendWidgets( itemToInfo( item ) );
+
+    if ( legendWidgets.size() == 1 )
+    {
+        QwtLegendLabel *legendLabel =
+            qobject_cast<QwtLegendLabel *>( legendWidgets[0] );
+
+        if ( legendLabel )
+            legendLabel->setChecked( on );
+    }
 
     replot();
 }

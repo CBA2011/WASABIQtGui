@@ -3,20 +3,25 @@
 # Project created by QtCreator 2011-09-21T11:33:35
 #
 #-------------------------------------------------
-
+include(WASABIEngine/WASABIEngine.pri)
+include(WASABI-qwt-clone/qwt-code/qwt/qwtconfig.pri)
+QMAKEFEATURES += WASABI-qwt-clone/qwt-code/qwt
 QT       += core gui opengl network
+CONFIG += qwt
 
 TARGET = WASABIGuiQt
 TEMPLATE = app
 
-DEPENDPATH += . ../WASABIEngine
-INCLUDEPATH +=  ../WASABIEngine
-INCLUDEPATH +=  3rdparty/src
-win32-g++:LIBS += -L"../WASABIEngine/debug"
-win32-g++:LIBS += -lWASABIEngine
-win32-g++:LIBS += -L"./3rdparty/lib"
-win32-g++:LIBS += -lqwt
-unix:!symbian|win32: LIBS += -L$$PWD/../WASABIEngine/ -lWASABIEngine
+DEPENDPATH += . WASABIEngine
+INCLUDEPATH +=  WASABIEngine
+INCLUDEPATH +=  WASABI-qwt-clone/qwt-code/qwt/src
+win32-g++:LIBS += -L"$$_PRO_FILE_PWD_/WASABIEngine/release" -lWASABIEngine
+win32-g++:LIBS += -L"$$_PRO_FILE_PWD_/WASABI-qwt-clone/qwt-code/qwt/lib" -lqwt
+# win32-g++:LIBS += -L"$$_PRO_FILE_PWD_/WASABI-qwt-clone/qwt-code/qwt/lib" -lqwtmathml
+#win32-g++:LIBS += -lWASABIEngine
+# win32-g++:LIBS += -L"WASABI-qwt-clone/qwt-code/qwt"
+# win32-g++:LIBS += -lqwt
+unix:!symbian|win32: LIBS += -L$$PWD/WASABIEngine/ -lWASABIEngine
 
 SOURCES += main.cpp\
         wasabiqtwindow.cpp \

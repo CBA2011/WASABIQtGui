@@ -6,6 +6,8 @@ GUI part version 0.7
 Copyright (C) 2011 Christian Becker-Asano.
 All rights reserved.
 
+qwt as submodule: http://stackoverflow.com/a/465151
+
 Contact: Christian Becker-Asano (christian (at) becker-asano (dot) de)
 
 1a. Compiling
