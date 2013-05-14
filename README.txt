@@ -51,7 +51,7 @@ Starting directly from within QtCreator should work out-of-the-box. If you want 
 - *.emo_dyn
 - *.emo_pad
 - *.se
-These file(types) can be found in the source folder alongsight all the other sources.
+These file(types) can be found in the source folder alongside the sources.
 
 -- Linux --
 
