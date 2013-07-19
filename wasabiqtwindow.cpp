@@ -36,6 +36,8 @@
 #include <QInputDialog>
 #include <QtGui>
 #include <QtNetwork>
+#include <QMessageBox>
+#include <QErrorMessage>
 
 
 // some helpers from http://www.gammon.com.au/forum/bbshowpost.php?bbsubject_id=2896
@@ -93,6 +95,10 @@ WASABIQtWindow::WASABIQtWindow(QWidget *parent) :
 
     if (!loadInitFile(sPort)) {
         qDebug() << "WASABIQtWindow::WASABIQtWindow: unable to load WASABI.ini or something went wrong!";
+        QErrorMessage *error = new QErrorMessage(this);
+        QString errorMessage;
+        errorMessage.append("Unable to load WASABI.ini, which should be in ").append(dir.currentPath()).append("!");
+        error->showMessage(errorMessage);
     }
     qDebug() << "WASABIQtWindow::WASABIQtWindow: serverPort is '" << sPort << "'";
 
@@ -327,8 +333,9 @@ bool WASABIQtWindow::loadInitFile(int& sPort) {
     } //if (file)
     else {
         qDebug()
-                << "MyApp::loadInitFile: ERROR Could not open file!"
+                << "MyApp::loadInitFile: ERROR Could not open file! --> creating dummy JohnDoe :)"
                    ;
+        int newLocalID = wasabi->addEmotionalAttendee("JohnDoe");
         return false; //could not open file;
     }
     return true;
@@ -1031,7 +1038,7 @@ void WASABIQtWindow::on_checkBoxSending_stateChanged(int arg1)
 
 void WASABIQtWindow::actionAbout() {
     QMessageBox* about;
-    about = new QMessageBox(QMessageBox::Information, "About WASABIQtGUI", QString("<p>Copyright (C) 2011 Christian Becker-Asano. <br>All rights reserved.<br>Contact: Christian Becker-Asano (christian@becker-asano.de)</p>This is version %0 of the Qt-based Graphical User Interface (GUI) WASABIQtGUI, which depends on the shared library WASABIEngine to run the WASABI Affect Simulation Architecture as described in the doctoral thesis of Christian Becker-Asano. It is licensed under the LGPL and its source can be obtained freely via GitHub.<p>For further information, please visit:<br> <a href='https://www.becker-asano.de/index.php/component/search/?searchword=WASABI'>https://www.becker-asano.de/index.php/component/search/?searchword=WASABI</a></p>").arg(CURRENT_VERSION), QMessageBox::Ok);
+    about = new QMessageBox(QMessageBox::Information, "About WASABIQtGUI", QString("<p>Copyright (C) 2011 Christian Becker-Asano. <br>All rights reserved.<br>Contact: Christian Becker-Asano (christian@becker-asano.de)</p>This is version %0 of the Qt5-based Graphical User Interface (GUI) WASABIQtGUI, which depends on the shared libraries WASABIEngine and qwt (included as submodules) to run the WASABI Affect Simulation Architecture as described in the doctoral thesis of Christian Becker-Asano. It is licensed under the LGPL and its source can be obtained freely via GitHub.<p>For further information, please visit:<br> <a href='https://www.becker-asano.de/index.php/component/search/?searchword=WASABI'>https://www.becker-asano.de/index.php/component/search/?searchword=WASABI</a></p>").arg(CURRENT_VERSION), QMessageBox::Ok);
     about->setTextFormat(Qt::RichText);
     about->show();
 }
