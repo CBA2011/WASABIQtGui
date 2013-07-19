@@ -6,8 +6,9 @@
 #include <qdatetime.h>
 #include <qlayout.h>
 #include "WASABIEngine.h"
+#include "wasabiqtwindow.h"
 
-#define HISTORY 60 // seconds
+#define HISTORY 300 // seconds
 
 class QwtPlotCurve;
 
@@ -42,12 +43,11 @@ public:
         Pleasure,
         Arousal,
         Dominance,
-        Idle,
 
         NCpuData
     };
 
-    PADPlot( QWidget * = 0 );
+    PADPlot( QWidget * parent = 0);
     const QwtPlotCurve *cpuCurve( int id ) const
     {
         return data[id].curve;
@@ -91,6 +91,9 @@ private:
     PADPlot* plot;
     QVBoxLayout *layout;
     QWidget* vBox;
+    void hideEvent(QHideEvent *event);
+    WASABIQtWindow *wasabiWindow;
+
 };
 
 #endif // WASABIQWTPLOTTER_H

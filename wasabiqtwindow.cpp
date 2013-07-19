@@ -106,6 +106,11 @@ WASABIQtWindow::WASABIQtWindow(QWidget *parent) :
     padWindow->resize(padWindow->sizeHint());
     padWindow->show();
 
+    // Create the qwt-based plotter window
+    qwtPlotterWindow = new WASABIqwtPlotter(this, wasabi);
+    qwtPlotterWindow->resize(qwtPlotterWindow->sizeHint());
+    qwtPlotterWindow->show();
+
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
     timer->start(1000/updateRate); // 50Hz
@@ -136,6 +141,8 @@ WASABIQtWindow::WASABIQtWindow(QWidget *parent) :
     str.setNum(sPort+1);
     ui->lineEditReceiverPort->setText(str);
     connect(ui->actionAbout, SIGNAL(triggered()), SLOT(actionAbout()) );
+    connect(ui->actionPAD_space, SIGNAL(triggered()), SLOT(actionPAD_space()) );
+    connect(ui->actionPlot, SIGNAL(triggered()), SLOT(actionPlot()) );
 }
 
 WASABIQtWindow::~WASABIQtWindow()
@@ -1028,6 +1035,25 @@ void WASABIQtWindow::actionAbout() {
     about->setTextFormat(Qt::RichText);
     about->show();
 }
+
+void WASABIQtWindow::actionPAD_space() {
+    if (ui->actionPAD_space->isChecked()){
+        padWindow->show();
+    }
+    else {
+        padWindow->hide();
+    }
+}
+
+void WASABIQtWindow::actionPlot() {
+    if (ui->actionPlot->isChecked()) {
+        qwtPlotterWindow->show();
+    }
+    else {
+        qwtPlotterWindow->hide();
+    }
+}
+
 //EXTENSION2
 std::string
 WASABIQtWindow::composeEmoML(cogaEmotionalAttendee* ea)
@@ -1062,4 +1088,14 @@ void WASABIQtWindow::on_pushButton_network_send_clicked()
         printNetworkMessage(datagram.data(), false, false);
     }
     std::cout << " done!" << std::endl;
+}
+
+void WASABIQtWindow::setPADspace(bool state)
+{
+    ui->actionPAD_space->setChecked(state);
+}
+
+void WASABIQtWindow::setQWT(bool state)
+{
+    ui->actionPlot->setChecked(state);
 }
