@@ -31,10 +31,15 @@ PADWindow::PADWindow(QWidget *parent, WASABIQtWindow *window) :
 {
     glPADWidget = new GLPADWidget(this, window);
     this->setCentralWidget(glPADWidget);
+    this->wasabiWindow = window;
 
     setWindowTitle(tr("PADWindow"));
 }
 
 void PADWindow::refresh() {
     glPADWidget->repaint();
+}
+
+void PADWindow::hideEvent(QHideEvent *he) {
+    wasabiWindow->setPADspace(false);//ui->actionPAD_space->setChecked(false);
 }

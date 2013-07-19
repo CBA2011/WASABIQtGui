@@ -31,10 +31,6 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     WASABIQtWindow w;
     w.show();
-    // Create the qwt-based plotter window
-    WASABIqwtPlotter* qwtPlotterWindow = new WASABIqwtPlotter(&w, w.wasabi);
-    qwtPlotterWindow->resize(qwtPlotterWindow->sizeHint());
-    qwtPlotterWindow->show();
 
     return a.exec();
 }
