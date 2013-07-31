@@ -1106,3 +1106,4 @@ void WASABIQtWindow::setQWT(bool state)
 {
     ui->actionPlot->setChecked(state);
 }
+

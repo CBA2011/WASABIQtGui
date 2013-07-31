@@ -124,7 +124,7 @@ void GLPADWidget::initializeGL()
     dynamicSpace = makeDynamic();
     padSpace = makePAD();
     padSphere = makeSphere();
-    alphaBetaRegion = makeCircle(0.99);
+    alphaBetaRegion = makeCircle(0.95);
     saturationRegion = makeCircle(0.95);
     activationRegion = makeCircle(0.99);
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
@@ -137,6 +137,7 @@ void GLPADWidget::paintGL()
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
     glFrustum( -100.0, 100.0, -100.0, 100.0, 500.0, 5000.0 );
+    // Checking whether or not to paint the 3D dynamic space:
     glTranslatef(0,0,-1000);
     glRotatef(xRot / 16.0, 1.0, 0.0, 0.0);
     glRotatef(yRot / 16.0, 0.0, 1.0, 0.0);
@@ -144,12 +145,15 @@ void GLPADWidget::paintGL()
     glMatrixMode( GL_MODELVIEW );
 
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    glPushMatrix();
-    glCallList( padSpace );
-    QGLWidget::renderText(120,0,0,"+A");
-    QGLWidget::renderText(0,120,0,"+P");
-    QGLWidget::renderText(0,0,120,"+D");
-    glPopMatrix();
+
+    if (parentWindow && !parentWindow->showXYZ()) {
+        glPushMatrix();
+        glCallList( padSpace );
+        QGLWidget::renderText(120,0,0,"+A");
+        QGLWidget::renderText(0,120,0,"+P");
+        QGLWidget::renderText(0,0,120,"+D");
+        glPopMatrix();
+    }
 
 
 
@@ -160,13 +164,15 @@ void GLPADWidget::paintGL()
     currentEA = parentWindow->getCurrentEA();
 
     if (cogaEmotionalAttendee* ea = wasabi->getEAfromID(currentEA)) {
-        std::vector<AffectiveState*>::const_iterator iter_as =
-                ea->EmoConPerson->affectiveStates.begin();
-        for (; iter_as != ea->EmoConPerson->affectiveStates.end(); ++iter_as) {
-            if (parentWindow && parentWindow->getHighlightedAffectiveState() == *iter_as) {
-                paintAffectiveState((**iter_as), true);
-            } else {
-                paintAffectiveState((**iter_as));
+        if (parentWindow && !parentWindow->showXYZ()) {
+            std::vector<AffectiveState*>::const_iterator iter_as =
+                    ea->EmoConPerson->affectiveStates.begin();
+            for (; iter_as != ea->EmoConPerson->affectiveStates.end(); ++iter_as) {
+                if (parentWindow && parentWindow->getHighlightedAffectiveState() == *iter_as) {
+                    paintAffectiveState((**iter_as), true);
+                } else {
+                    paintAffectiveState((**iter_as));
+                }
             }
         }
         glPopMatrix();
@@ -177,9 +183,10 @@ void GLPADWidget::paintGL()
             glPushMatrix();
             GLfloat color[4];
             glGetFloatv(GL_CURRENT_COLOR, color);
-            glColor3f(0.5, 0.5, 1.0);
+            glColor3f(1.0, 1.0, 1.0);
 
             glCallList(dynamicSpace);
+            glColor3f(.8, .8, 1.0);
 
             std::vector<cogaEmotionalAttendee*>::iterator iter_ea;
             for (iter_ea = wasabi->emoAttendees.begin(); iter_ea
@@ -202,30 +209,31 @@ void GLPADWidget::paintGL()
             QGLWidget::renderText(0,120,0,"Y");
             QGLWidget::renderText(0,0,120,"Z");
             glPopMatrix();
-            glColor4fv(color);
             glScalef((float) ea->EmoConPerson->xReg,
                      (float) ea->EmoConPerson->yReg, 1);
             glCallList(alphaBetaRegion);
+            glColor4fv(color);
             glPopMatrix();
         }
     }
-    //padSphere for the agent
-    GLfloat color[4];
-    glGetFloatv(GL_CURRENT_COLOR, color);
-    std::vector<cogaEmotionalAttendee*>::iterator iter_ea;
-    for (iter_ea = wasabi->emoAttendees.begin(); iter_ea
-         != wasabi->emoAttendees.end(); ++iter_ea) {
-        cogaEmotionalAttendee* ea = (*iter_ea);
-        glPushMatrix();
-        glTranslatef((float) ea->getAValue(), (float) ea->getPValue(),(float) ea->getDValue());
-        glColor3f(0.8, 0.8, 0.8);
-        glCallList(padSphere);
-        glTranslatef(0, -10, 0);
-        QGLWidget::renderText(0,0,0,ea->getName().c_str());
-        glPopMatrix();
+    if (parentWindow && !parentWindow->showXYZ()) {
+        //padSphere for the agent
+        GLfloat color[4];
+        glGetFloatv(GL_CURRENT_COLOR, color);
+        std::vector<cogaEmotionalAttendee*>::iterator iter_ea;
+        for (iter_ea = wasabi->emoAttendees.begin(); iter_ea
+             != wasabi->emoAttendees.end(); ++iter_ea) {
+            cogaEmotionalAttendee* ea = (*iter_ea);
+            glPushMatrix();
+            glTranslatef((float) ea->getAValue(), (float) ea->getPValue(),(float) ea->getDValue());
+            glColor3f(0.8, 0.8, 0.8);
+            glCallList(padSphere);
+            glTranslatef(0, -10, 0);
+            QGLWidget::renderText(0,0,0,ea->getName().c_str());
+            glPopMatrix();
+        }
+        glColor4fv(color);
     }
-    glColor4fv(color);
-
     glFlush();
 
     //QGLWidget::swapBuffers();
@@ -357,11 +365,31 @@ GLuint GLPADWidget::makeDynamic()
 
     glLineWidth( 1.0 );
 
-    glBegin( GL_LINE_LOOP );
-    glVertex3f(  50.0,  50.0, 0.0 );
-    glVertex3f(  50.0, -50.0, 0.0 );
-    glVertex3f( -50.0, -50.0, 0.0 );
-    glVertex3f( -50.0,  50.0, 0.0 );
+    glBegin( GL_LINE_STRIP );
+    glVertex3f(  0.0,  -100.0, 0.0 );
+    glVertex3f(  0.0, 100.0, 0.0 );
+    glVertex3f( -10.0, 90.0, 0.0 );
+    glVertex3f( 10.0,  90.0, 0.0 );
+    glVertex3f( 0.0,  100.0, 0.0 );
+    glEnd();
+
+    glBegin( GL_LINE_STRIP );
+    glVertex3f(  -100.0,  0.0, 0.0 );
+    glVertex3f(  100.0, 0.0, 0.0 );
+    glVertex3f( 85.0, -5.0, 0.0 );
+    glVertex3f( 85.0,  5.0, 0.0 );
+    glVertex3f(  100.0, 0.0, 0.0 );
+    glEnd();
+
+    glBegin( GL_LINE_STRIP );
+    glVertex3f(  0.0,  0.0, 0.0 );
+    glVertex3f(  0.0, 0.0, -100.0 );
+    glVertex3f( 0.0, -5.0, -95.0 );
+    glVertex3f( 0.0,  5.0, -95.0 );
+    glVertex3f(  0.0, 0.0, -100.0 );
+    glVertex3f( -5.0, 0.0, -95.0 );
+    glVertex3f( 5.0,  0.0, -95.0 );
+    glVertex3f(  0.0, 0.0, -100.0 );
     glEnd();
 
     glEndList();
@@ -403,9 +431,22 @@ GLuint GLPADWidget::makePAD()
     glVertex3f(  100.0, -100.0, -100.0 );   glVertex3f(  100.0, -100.0, 100.0 );
     glVertex3f( -100.0, -100.0, -100.0 );   glVertex3f( -100.0, -100.0, 100.0 );
     glVertex3f( -100.0,  100.0, -100.0 );   glVertex3f( -100.0,  100.0, 100.0 );
+    glEnd();
+
+    glBegin (GL_LINE_LOOP);
     glVertex3f( -120.0,  0.0,  0.0 );   glVertex3f(  120.0,  0.0, 0.0 );
+    glVertex3f( 105.0,  -5.0,  0.0 );   glVertex3f(  105.0,  5.0, 0.0 );  glVertex3f(  120.0,  0.0, 0.0 );
+    glEnd();
+
+    glBegin (GL_LINE_LOOP);
+    //glVertex3f( -120.0,  0.0,  0.0 );   glVertex3f(  120.0,  0.0, 0.0 );
     glVertex3f(  0.0, -120.0,  0.0 );   glVertex3f(  0.0,  120.0, 0.0 );
+    glVertex3f(  -10.0, 110.0,  0.0 );   glVertex3f(  10.0,  110.0, 0.0 );  glVertex3f( 0.0,  120.0, 0.0 );
+    glEnd();
+
+    glBegin(GL_LINE_LOOP);
     glVertex3f(  0.0,  0.0, -120.0 );   glVertex3f(  0.0,  0.0, 120.0 );
+    glVertex3f(  0.0,  -5.0, 110.0 );   glVertex3f(  0.0,  5.0, 110.0 );  glVertex3f(  0.0,  0.0, 120.0 );
     glEnd();
 
     glEndList();
@@ -441,7 +482,7 @@ GLuint GLPADWidget::makeCircle( float radius)
     glNewList( obj, GL_COMPILE );
 
     gluQuadricTexture( q, GL_TRUE );
-    gluDisk(q, radius, 1, 24, 2);
+    gluDisk(q, radius, 1.01, 24, 2);
     glEndList();
     gluDeleteQuadric( q );
     return obj;
