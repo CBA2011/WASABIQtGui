@@ -925,18 +925,36 @@ void WASABIQtWindow::processPendingDatagrams()
 }
 
 void WASABIQtWindow::broadcastDatagram() {
+    char buffer[33];
+    itoa(wasabi->emoAttendees.size(),buffer,10);
     std::string padString;
-    if (wasabi->getPADString(padString, currentEA)) {
-        myReplace(padString, "&", " ");
-    } else {
-        std::cerr << "WASABIQtWindow::printNetworkMessage: No padString found!" << std::endl;
-    }
+    std::string padStrings = "total=";
+    padStrings += buffer;
+    padStrings += " ";
+    std::vector<cogaEmotionalAttendee*>::iterator iter_ea;
+    //const char* pEmoMlStr;
+    for (iter_ea = wasabi->emoAttendees.begin(); iter_ea != wasabi->emoAttendees.end(); ++iter_ea){
+        if (iter_ea != wasabi->emoAttendees.end() && iter_ea != wasabi->emoAttendees.begin()) {
+            padStrings += " ";
+        }
+        cogaEmotionalAttendee* ea = (*iter_ea);
+        if (wasabi->getPADString(padString, ea->getLocalID())) {
+            myReplace(padString, "&", " ");
+        } else {
+            std::cerr << "WASABIQtWindow::printNetworkMessage: No padString found!" << std::endl;
+        }
 
-    ui->textEditOut->append(QString("(%0) %1: %2").arg(QTime::currentTime().toString())
-                            .arg(wasabi->getEAfromID(currentEA)->getName().c_str())
+        ui->textEditOut->append(QString("(%0) %1: %2").arg(QTime::currentTime().toString())
+                            .arg(ea->getName().c_str())
                             .arg(padString.c_str()));
+        //padStrings += std::to_string(ea->getLocalID());
+        itoa(ea->getLocalID(), buffer, 10);
+        padStrings += "ID";
+        padStrings += buffer;
+        padStrings += "=" + ea->getGlobalID() + " ( " + padString + " )";
+    }
     if (ui->checkBox_senderMode_AL->isChecked()) {
-        QByteArray datagram(padString.c_str());
+        QByteArray datagram(padStrings.c_str());
         if (udpSocketSender->writeDatagram(datagram.data(), datagram.size(), QHostAddress::Broadcast, sPort) != -1) {
             printNetworkMessage(datagram.data(), false, true);
         }
