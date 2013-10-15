@@ -41,6 +41,12 @@ public:
 
     void refresh();
 
+protected:
+
+    WASABIQtWindow *wasabiWindow;
+
+    void hideEvent(QHideEvent *event);
+
 signals:
 
 public slots:

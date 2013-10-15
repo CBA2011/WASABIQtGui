@@ -12,6 +12,7 @@
 #include <qstringlist.h>
 #include <qfile.h>
 #include <qtextstream.h>
+#include "wasabiqtwindow.h"
 
 PADStat::PADStat()
 {
@@ -34,30 +35,6 @@ void PADStat::statistic( double &p, double &a, double &d )
     d = (double)wasabi->getEAfromID()->getDValue();
     // TODO: Fill the values from wasabi
 }
-
-//void PADStat::lookUp( double values[NValues] ) const
-//{
-//    {
-//        QTextStream textStream( &file );
-//        do
-//        {
-//            QString line = textStream.readLine();
-//            line = line.trimmed();
-//            if ( line.startsWith( "cpu " ) )
-//            {
-//                const QStringList valueList =
-//                    line.split( " ",  QString::SkipEmptyParts );
-//                if ( valueList.count() >= 5 )
-//                {
-//                    for ( int i = 0; i < NValues; i++ )
-//                        values[i] = valueList[i+1].toDouble();
-//                }
-//                break;
-//            }
-//        }
-//        while( !textStream.atEnd() );
-//    }
-//}
 
 
 class TimeScaleDraw: public QwtScaleDraw
@@ -177,13 +154,13 @@ PADPlot::PADPlot( QWidget *parent ):
     curve = new PADCurve( "Pleasure" );
     curve->setColor( Qt::red );
     curve->attach( this );
-    data[Arousal].curve = curve;
+    data[Pleasure].curve = curve;
 
     curve = new PADCurve( "Arousal" );
     curve->setColor( Qt::blue );
     curve->setZ( curve->z() - 1 );
     curve->attach( this );
-    data[Pleasure].curve = curve;
+    data[Arousal].curve = curve;
 
     curve = new PADCurve( "Dominance" );
     curve->setColor( Qt::black );
@@ -191,16 +168,9 @@ PADPlot::PADPlot( QWidget *parent ):
     curve->attach( this );
     data[Dominance].curve = curve;
 
-    curve = new PADCurve( "Idle" );
-    curve->setColor( Qt::darkCyan );
-    curve->setZ( curve->z() - 3 );
-    curve->attach( this );
-    data[Idle].curve = curve;
-
-    showCurve( data[Arousal].curve, true );
     showCurve( data[Pleasure].curve, true );
+    showCurve( data[Arousal].curve, true );
     showCurve( data[Dominance].curve, false );
-    showCurve( data[Idle].curve, false );
 
     for ( int i = 0; i < HISTORY; i++ )
         timeData[HISTORY - 1 - i] = i;
@@ -228,9 +198,6 @@ void PADPlot::timerEvent( QTimerEvent * )
     }
 
     padStat.statistic( data[Pleasure].data[0], data[Arousal].data[0], data[Dominance].data[0] );
-
-    //data[Total].data[0] = data[Pleasure].data[0] + data[Arousal].data[0];
-    data[Idle].data[0] = 0.0;
 
     if ( dataCount < HISTORY )
         dataCount++;
@@ -275,6 +242,7 @@ WASABIqwtPlotter::WASABIqwtPlotter(QWidget *parent, WASABIEngine *wasabi) :
     QMainWindow(parent)
 {
    // this->wasabi = wasabi;
+    wasabiWindow = (WASABIQtWindow*) parent;
     vBox = new QWidget(this);
     vBox->setWindowTitle( "Cpu Plot" );
 
@@ -285,7 +253,7 @@ WASABIqwtPlotter::WASABIqwtPlotter(QWidget *parent, WASABIEngine *wasabi) :
     plot->setContentsMargins( margin, margin, margin, margin );
     plot->setWASABI(wasabi);
 
-    QString info( "Press the legend to en/disable a curve" );
+    QString info( "Under construction.." );
 
     QLabel *label = new QLabel( info, this );
 
@@ -305,4 +273,10 @@ QSize WASABIqwtPlotter::minimumSizeHint() const
 QSize WASABIqwtPlotter::sizeHint() const
 {
     return QSize(600, 400);
+}
+
+void WASABIqwtPlotter::hideEvent(QHideEvent *he) {
+    if (wasabiWindow) {
+        wasabiWindow->setQWT(false);
+    }
 }

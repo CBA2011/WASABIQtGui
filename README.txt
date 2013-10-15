@@ -11,9 +11,15 @@ qwt as submodule: http://stackoverflow.com/a/465151
 Contact: Christian Becker-Asano (christian (at) becker-asano (dot) de)
 
 1a. Setup
-This program can be compiled as using "Qt Creator" version 2.4.1 (MinGW4.6.2, Qt4.7.4) under MS Windows 7. It depends on Qt, OpenGL, QWT (http://qwt.sourceforge.net/), and the WASABIEngine as dynamically linked libraries.
-The first two come with the Qt SDK. The last two are integrated as submudules.
-After a fresh clone of this project, you will only have the empty subdirectories "WASABIEngine" and "WASABI-qwt-clone" and compiling will fail. Thus, perform:
+
+As of July 2013, this program can be compiled as using "Qt Creator" version 2.7.2 available here: 
+http://qt-project.org/downloads
+Internally it uses MinGW gcc 4.8.0 for Qt5.1.0 (under MS Windows 7). 
+Older versions of Qt shipping with older versions of the Qt Creator might work as well, but lately I ran into serious trouble with the Nokia SDK version. Thus, I switched to the qt-project.org version of Qt5.
+
+It depends on Qt, OpenGL, QWT (http://qwt.sourceforge.net/), and the WASABIEngine as dynamically linked libraries. The first two come with the Qt SDK. The last two are integrated as submodules.
+
+After a fresh clone of this project or after the first "Pull" that updates your local repo to the submodule version, you will only have the empty subdirectories "WASABIEngine" and "WASABI-qwt-clone" and compiling will fail. Thus, perform:
 $ git submodule update --init "WASABIEngine"
 $ git submodule update --init "WASABI-qwt-clone"
 
@@ -21,13 +27,15 @@ $ git submodule update --init "WASABI-qwt-clone"
 
 -- Win7 --
 
+OLD instructions for the Nokia SDK version of Qt4: 
+===
 IMPORTANT: Please make sure to change the setting of every project to use the "MinGW (32bit)" toolchain and not the option "MinGW as a gcc for Windows targets" under Projects->Goals->Build configurations->Toolchains". In addition, currently only the RELEASE configuration seems to work. So, please also change to "release" configuration in each project.
 Then proceed as follows:
-A1. open the file "\WASABI-qwt-clone\qwt-code\qwt\qwt.pro" in QtCreator don't using "shadow build".
+A1. open the file "\WASABI-qwt-clone\qwt-code\qwt\qwt.pro" in QtCreator not using "shadow build".
 A2. change the Toolchain setting as explained above for both the debug and release configuration.
 A3. change to the release configuration (left panel button)
 A4. "build" the project (Ctrl-B). This will take some time.
-B1. open the file "\WASABIEngine\WASABIEngine.pro" in QtCreator don't using "shadow build".
+B1. open the file "\WASABIEngine\WASABIEngine.pro" in QtCreator not using "shadow build".
 B2. change the Toolchain setting as explained above for both the debug and release configuration.
 B3. change to the release configuration (left panel button)
 B4. "build" the project (Ctrl-B). This won't take too long.
@@ -35,6 +43,30 @@ C1. set the project "WASABIGuiQt" to be the "active project" (right-click menu)
 C2. change the Toolchain setting as explained above for both the debug and release configuration.
 C3. change to the release configuration (left panel button)
 C4. press the play button to compile and run.
+===
+
+NEW instructions for the qt-project.org-Version of Qt5:
+===
+A1. Open the file "WASABIGuiQt.pro" by double clicking on it.
+A2. use the default configuration for "Desktop Qt 5.1.0 MinGW 32bit" with two seperate directories for "Debug" and "Release".
+    That looks something like "../build-WASABIGuiQt-Desktop_Qt_5_1_0_MinGW_32bit-Debug" and "../build-WASABIGuiQt-Desktop_Qt_5_1_0_MinGW_32bit-Release" for me.
+A3. Try to compile in Debug mode and you will get a message like "cannot find -lWASABIEngine".
+B1. Open the file "WASABIEngine/WASABIEngine.pro".
+B2. IMPORTANT: Manually change the build directories for Debug and Release to the folders "WASABIEngine/debug" and "WASABIEngine/release", resp. Ignore the qmake warning.
+B3. Change to "Debug" mode on the left panel (the Computer screen button), and hit "build" (the hammer button).
+	This should result in the file "WASABIEngine/debug/WASABIEngine.dll".
+C1. Open the file "WASABI-qwt-clone/qwt-code/qwt/qwt.pro", 
+C2. AGAIN: Change both build directories for Debug and Release to "WASABI-qwt-clone/qwt-code/qwt/lib".
+C3 Change to "Debug" mode again, and hit "build".
+	This takes some time, because all the qwt projects are compiled as well.
+A4. Finally, make the WASABIGuiQt project the active project by right-clicking on it in the "Projects" pane and selecting the corresponding option.
+A5. Press the green "Play" button to the left.
+	You will be presented with an error message like "Unable to load WASABI.ini", because the following files need to be copied to the folder indicated in that message:
+	- WASABI.ini
+	- *.emo_dyn
+	- *.emo_pad
+	- *.se
+	They can be found in the main folder of the project.
 
 Take a look at the WASABIGuiQt.pro file, if you run into trouble. The system expects to find the "WASABIEngine.dll" in the directory "WASABIEngine\release" subdirectory. The qwt.dll should reside in the "WASABI-qwt-clone/qwt-code/qwt/lib" subdirectory.
 
