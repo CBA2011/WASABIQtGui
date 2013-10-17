@@ -1,0 +1,275 @@
+<emotionml version="1.0" xmlns="http://www.w3.org/2009/10/emotionml"
+	xmlns:wasabi="http://www.becker-asano.de/WASABI/Shema/WASABI"
+	dimension-set="http://www.w3.org/TR/emotion-voc/xml#pad-dimensions"
+	xmlns:xsi="http://www.w3.org/2009/10/emotionml"
+	xsi:noNamespaceSchemaLocation="emotionml.xsd">
+	<info>
+		<!-- 
+		These values for emotion dynamcis are taken from Listing 6.1 on page 141 of CBA'S thesis published in 2008. They can be considered the default values for WASABI. 
+		-->
+		<wasabi:parameter type="dynamic" name="xTens" value="50"/>
+		<wasabi:parameter type="dynamic" name="yTens" value="10"/>
+		<wasabi:parameter type="dynamic" name="slope" value="500"/>
+		<wasabi:parameter type="dynamic" name="mass" value="5000"/>
+		<wasabi:parameter type="dynamic" name="xReg" value="1"/>
+		<wasabi:parameter type="dynamic" name="yReg" value="1"/>
+		<wasabi:parameter type="dynamic" name="boredom" value="50"/>
+		<wasabi:parameter type="dynamic" name="prevalence" value="0"/>
+	</info>
+	<emotion id="angry" category-set="http://www.w3.org/TR/emotion-voc/xml#fsre-categories">
+		<category name="anger"/>
+		<dimension name="pleasure" value="0.25"/>
+		<dimension name="arousal" value="0.5"/>
+		<dimension name="dominance" value="1.0"/>
+		<info>
+			<wasabi:primary>
+				<wasabi:parameter name="base_intensity" value="0.75"/>
+				<wasabi:parameter name="act_threshold" value="0.64"/>
+				<wasabi:parameter name="sat_threshold" value="0.2"/>
+				<wasabi:parameter name="decay" value="linear"/>
+			</wasabi:primary>
+		</info>
+	</emotion>
+	<emotion id="annoyed" category-set="http://www.w3.org/TR/emotion-voc/xml#fsre-categories">
+		<category name="disappointment"/>
+		<dimension name="pleasure" value="0.25"/>
+		<dimension name="arousal" value="0.5"/>
+		<dimension name="dominance" value="1.0"/>
+		<info>
+			<wasabi:primary>
+				<wasabi:parameter name="base_intensity" value="0.75"/>
+				<wasabi:parameter name="act_threshold" value="0.64"/>
+				<wasabi:parameter name="sat_threshold" value="0.2"/>
+				<wasabi:parameter name="decay" value="linear"/>
+			</wasabi:primary>
+		</info>
+	</emotion>
+	<emotion id="bored" category-set="http://www.w3.org/TR/emotion-voc/xml#everyday-categories">
+		<category name="bored"/>
+		<dimension name="pleasure" value="0.5"/>
+		<dimension name="arousal" value="0.1"/>
+		<dimension name="dominance" value="1.0"/>
+		<info>
+			<wasabi:primary>
+				<wasabi:parameter name="base_intensity" value="0.75"/>
+				<wasabi:parameter name="act_threshold" value="0.64"/>
+				<wasabi:parameter name="sat_threshold" value="0.2"/>
+				<wasabi:parameter name="decay" value="linear"/>
+			</wasabi:primary>
+		</info>
+	</emotion>
+	<emotion id="concentrated1" category-set="http://www.w3.org/TR/emotion-voc/xml#everyday-categories">
+		<category name="relaxed"/>
+		<dimension name="pleasure" value="0.5"/>
+		<dimension name="arousal" value="0.5"/>
+		<dimension name="dominance" value="1.0"/>
+		<info>
+			<wasabi:primary>
+				<wasabi:parameter name="base_intensity" value="0.75"/>
+				<wasabi:parameter name="act_threshold" value="0.64"/>
+				<wasabi:parameter name="sat_threshold" value="0.2"/>
+				<wasabi:parameter name="decay" value="linear"/>
+			</wasabi:primary>
+		</info>
+	</emotion>
+	<emotion id="concentrated2" category-set="http://www.w3.org/TR/emotion-voc/xml#everyday-categories">
+		<category name="relaxed"/>
+		<dimension name="pleasure" value="0.5"/>
+		<dimension name="arousal" value="0.5"/>
+		<dimension name="dominance" value="0.0"/>
+		<info>
+			<wasabi:primary>
+				<wasabi:parameter name="base_intensity" value="0.75"/>
+				<wasabi:parameter name="act_threshold" value="0.64"/>
+				<wasabi:parameter name="sat_threshold" value="0.2"/>
+				<wasabi:parameter name="decay" value="linear"/>
+			</wasabi:primary>
+		</info>
+	</emotion>
+	<emotion id="depressed" category-set="http://www.w3.org/TR/emotion-voc/xml#everyday-categories">
+		<category name="bored"/>
+		<dimension name="pleasure" value="0.5"/>
+		<dimension name="arousal" value="0.1"/>
+		<dimension name="dominance" value="0.0"/>
+		<info>
+			<wasabi:primary>
+				<wasabi:parameter name="base_intensity" value="0.75"/>
+				<wasabi:parameter name="act_threshold" value="0.64"/>
+				<wasabi:parameter name="sat_threshold" value="0.2"/>
+				<wasabi:parameter name="decay" value="linear"/>
+			</wasabi:primary>
+		</info>
+	</emotion>
+	<emotion id="fearful" category-set="http://www.w3.org/TR/emotion-voc/xml#fsre-categories">
+		<category name="fear"/>
+		<dimension name="pleasure" value="0.1"/>
+		<dimension name="arousal" value="0.1"/>
+		<dimension name="dominance" value="0.0"/>
+		<info>
+			<wasabi:primary>
+				<wasabi:base_intensity>0.25</wasabi:base_intensity>
+				<wasabi:parameter name="act_threshold" value="0.64"/>
+				<wasabi:parameter name="sat_threshold" value="0.2"/>
+				<wasabi:parameter name="decay" value="linear"/>
+			</wasabi:primary>
+		</info>
+	</emotion>
+	<emotion id="happy1" category-set="http://www.w3.org/TR/emotion-voc/xml#fsre-categories">
+		<category name="happiness"/>
+		<dimension name="pleasure" value="0.9"/>
+		<dimension name="arousal" value="0.9"/>
+		<dimension name="dominance" value="1.0"/>
+		<info>
+			<wasabi:primary>
+				<wasabi:parameter name="base_intensity" value="0.75"/>
+				<wasabi:parameter name="act_threshold" value="0.64"/>
+				<wasabi:parameter name="sat_threshold" value="0.2"/>
+				<wasabi:parameter name="decay" value="linear"/>
+			</wasabi:primary>
+		</info>
+	</emotion>
+	<emotion id="happy2" category-set="http://www.w3.org/TR/emotion-voc/xml#fsre-categories">
+		<category name="happiness"/>
+		<dimension name="pleasure" value="0.9"/>
+		<dimension name="arousal" value="0.9"/>
+		<dimension name="dominance" value="0.0"/>
+		<info>
+			<wasabi:primary>
+				<wasabi:parameter name="base_intensity" value="0.75"/>
+				<wasabi:parameter name="act_threshold" value="0.64"/>
+				<wasabi:parameter name="sat_threshold" value="0.2"/>
+				<wasabi:parameter name="decay" value="linear"/>
+			</wasabi:primary>
+		</info>
+	</emotion>
+	<emotion id="happy3" category-set="http://www.w3.org/TR/emotion-voc/xml#fsre-categories">
+		<category name="happiness"/>
+		<dimension name="pleasure" value="0.5"/>
+		<dimension name="arousal" value="0.5"/>
+		<dimension name="dominance" value="1.0"/>
+		<info>
+			<wasabi:primary>
+				<wasabi:parameter name="base_intensity" value="0.75"/>
+				<wasabi:parameter name="act_threshold" value="0.64"/>
+				<wasabi:parameter name="sat_threshold" value="0.2"/>
+				<wasabi:parameter name="decay" value="linear"/>
+			</wasabi:primary>
+		</info>
+	</emotion>
+	<emotion id="happy4" category-set="http://www.w3.org/TR/emotion-voc/xml#fsre-categories">
+		<category name="happiness"/>
+		<dimension name="pleasure" value="0.5"/>
+		<dimension name="arousal" value="0.5"/>
+		<dimension name="dominance" value="0.0"/>
+		<info>
+			<wasabi:primary>
+				<wasabi:parameter name="base_intensity" value="0.75"/>
+				<wasabi:parameter name="act_threshold" value="0.64"/>
+				<wasabi:parameter name="sat_threshold" value="0.2"/>
+				<wasabi:parameter name="decay" value="linear"/>
+			</wasabi:primary>
+		</info>
+	</emotion>
+	<emotion id="sad" category-set="http://www.w3.org/TR/emotion-voc/xml#fsre-categories">
+		<category name="sadness"/>
+		<dimension name="pleasure" value="0.25"/>
+		<dimension name="arousal" value="0.5"/>
+		<dimension name="dominance" value="0.0"/>
+		<info>
+			<wasabi:primary>
+				<wasabi:parameter name="base_intensity" value="0.75"/>
+				<wasabi:parameter name="act_threshold" value="0.64"/>
+				<wasabi:parameter name="sat_threshold" value="0.2"/>
+				<wasabi:parameter name="decay" value="linear"/>
+			</wasabi:primary>
+		</info>
+	</emotion>
+	<emotion id="surprised1" category-set="http://www.w3.org/TR/emotion-voc/xml#fsre-categories">
+		<category name="surprise"/>
+		<dimension name="pleasure" value="0.55"/>
+		<dimension name="arousal" value="0.9"/>
+		<dimension name="dominance" value="1.0"/>
+		<info>
+			<wasabi:primary>
+				<wasabi:parameter name="base_intensity" value="0.0"/>
+				<wasabi:parameter name="act_threshold" value="0.64"/>
+				<wasabi:parameter name="sat_threshold" value="0.3"/>
+				<wasabi:parameter name="decay" value="linear"/>
+			</wasabi:primary>
+		</info>
+	</emotion>
+	<emotion id="surprised2" category-set="http://www.w3.org/TR/emotion-voc/xml#fsre-categories">
+		<category name="surprise"/>
+		<dimension name="pleasure" value="0.55"/>
+		<dimension name="arousal" value="0.9"/>
+		<dimension name="dominance" value="0.0"/>
+		<info>
+			<wasabi:primary>
+				<wasabi:parameter name="base_intensity" value="0.0"/>
+				<wasabi:parameter name="act_threshold" value="0.64"/>
+				<wasabi:parameter name="sat_threshold" value="0.3"/>
+				<wasabi:parameter name="decay" value="linear"/>
+			</wasabi:primary>
+		</info>
+	</emotion>
+	<emotion id="fears-confirmed" category-set="http://www.w3.org/TR/emotion-voc/xml#occ-categories">
+		<category name="fears-confirmed"/>
+		<info>
+			<wasabi:secondary>
+				<wasabi:base_intensity>0.0</wasabi:base_intensity>
+				<wasabi:lifetime>10.0</wasabi:lifetime>
+				<wasabi:parameter name="decay" value="linear"/>
+				<wasabi:polygon type="QUAD">
+					<wasabi:vertex pleasure="-1.0" arousal="1.0" dominance="-1.0" intensity="1.0"/>
+					<wasabi:vertex pleasure="0.0" arousal="1.0" dominance="-1.0" intensity="0.0"/>
+					<wasabi:vertex pleasure="0.0" arousal="-1.0" dominance="-1.0" intensity="0.0"/>
+					<wasabi:vertex pleasure="-1.0" arousal="-1.0" dominance="-1.0" intensity="1.0"/>
+				</wasabi:polygon>
+			</wasabi:secondary>
+		</info>
+	</emotion>
+	<emotion id="hope" category-set="http://www.w3.org/TR/emotion-voc/xml#occ-categories">
+		<category name="hope"/>
+		<info>
+			<wasabi:secondary>
+				<wasabi:base_intensity>0.0</wasabi:base_intensity>
+				<wasabi:lifetime>10.0</wasabi:lifetime>
+				<wasabi:parameter name="decay" value="linear"/>
+				<wasabi:polygon type="QUAD">
+					<wasabi:vertex pleasure="1.0" arousal="0.0" dominance="1.0" intensity="0.6"/>
+					<wasabi:vertex pleasure="1.0" arousal="1.0" dominance="1.0" intensity="1.0"/>
+					<wasabi:vertex pleasure="-1.0" arousal="1.0" dominance="1.0" intensity="0.5"/>
+					<wasabi:vertex pleasure="-1.0" arousal="0.0" dominance="1.0" intensity="0.1"/>
+				</wasabi:polygon>
+				<wasabi:polygon type="QUAD">
+					<wasabi:vertex pleasure="1.0" arousal="0.0" dominance="-1.0" intensity="0.6"/>
+					<wasabi:vertex pleasure="1.0" arousal="1.0" dominance="-1.0" intensity="1.0"/>
+					<wasabi:vertex pleasure="-1.0" arousal="1.0" dominance="-1.0" intensity="0.5"/>
+					<wasabi:vertex pleasure="-1.0" arousal="0.0" dominance="-1.0" intensity="0.1"/>
+				</wasabi:polygon>
+			</wasabi:secondary>
+		</info>
+	</emotion>
+	<emotion id="relief" category-set="http://www.w3.org/TR/emotion-voc/xml#occ-categories">
+		<category name="relief"/>
+		<info>
+			<wasabi:secondary>
+				<wasabi:base_intensity>0.0</wasabi:base_intensity>
+				<wasabi:lifetime>10.0</wasabi:lifetime>
+				<wasabi:parameter name="decay" value="linear"/>
+				<wasabi:polygon type="QUAD">
+					<wasabi:vertex pleasure="1.0" arousal="0.0" dominance="1.0" intensity="1.0"/>
+					<wasabi:vertex pleasure="1.0" arousal="0.5" dominance="1.0" intensity="1.0"/>
+					<wasabi:vertex pleasure="-1.0" arousal="0.5" dominance="1.0" intensity="0.2"/>
+					<wasabi:vertex pleasure="-1.0" arousal="0.0" dominance="1.0" intensity="0.2"/>
+				</wasabi:polygon>
+				<wasabi:polygon type="QUAD">
+					<wasabi:vertex pleasure="1.0" arousal="0.0" dominance="-1.0" intensity="1.0"/>
+					<wasabi:vertex pleasure="1.0" arousal="0.5" dominance="-1.0" intensity="1.0"/>
+					<wasabi:vertex pleasure="-1.0" arousal="0.5" dominance="-1.0" intensity="0.2"/>
+					<wasabi:vertex pleasure="-1.0" arousal="0.0" dominance="-1.0" intensity="0.2"/>
+				</wasabi:polygon>
+			</wasabi:secondary>
+		</info>
+	</emotion>
+</emotionml>

@@ -39,7 +39,6 @@
 #include <QMessageBox>
 #include <QErrorMessage>
 
-
 // some helpers from http://www.gammon.com.au/forum/bbshowpost.php?bbsubject_id=2896
 
 #define SPACES " \t\r\n"
@@ -103,7 +102,23 @@ WASABIQtWindow::WASABIQtWindow(QWidget *parent) :
     qDebug() << "WASABIQtWindow::WASABIQtWindow: serverPort is '" << sPort << "'";
 
     // create the main gui window
+    /* If WASABI.ini for a given EA does not reference a *.emo_dyn AND a *.emo_pad file, but only a *.xml file,
+     * then initAllEAs() will fail for that EA and ea->initialized will remain false.
+     * To keep Qt out of the WASABIEngine library, we need to check here all uninitialized ea's for their respective
+     * ea->xmlFilename(s) and parse these using Qt functionality.
+     */
     wasabi->initAllEAs();
+    std::vector<cogaEmotionalAttendee*>::iterator iter_ea;
+    for (iter_ea = wasabi->emoAttendees.begin(); iter_ea != wasabi->emoAttendees.end(); ++iter_ea){
+        cogaEmotionalAttendee* ea = (*iter_ea);
+        if (!(ea->initialized)){
+            qDebug() << "WASABIQtWindow::Trying to initialize EA " << ea->getLocalID() << " with xml file " << ea->EmoConPerson->xmlFilename.c_str();
+            if (initEAbyXML(ea)) {
+                qDebug() << "WASABIQtWindow::success!";
+            }
+        }
+    }
+
     comboBoxAttendee_update();
     initValues(wasabi->getEAfromID());
 
@@ -200,7 +215,7 @@ void WASABIQtWindow::updateGUI(bool force) {
 }
 
 bool WASABIQtWindow::loadInitFile(int& sPort) {
-    qDebug() << "MyApp::loadInitFile(): Trying to find and parse '" << globalInitFilename.c_str() << "'!";
+    qDebug() << "WASABIQtWindow::loadInitFile(): Trying to find and parse '" << globalInitFilename.c_str() << "'!";
     //Open file for reading
     std::ifstream file(globalInitFilename.c_str());
     std::string line;
@@ -237,8 +252,7 @@ bool WASABIQtWindow::loadInitFile(int& sPort) {
                                         if (!(word1.empty())) {
                                             isline >> word2;
                                             if (!(word2.empty())) {
-                                                switch (returnIndex(word1,
-                                                                    "dynFilename padFilename globalID simulationOn")) {
+                                                switch (returnIndex(word1, "dynFilename padFilename globalID simulationOn xmlFilename")) {
                                                 case 1: // dynFilename
                                                     if (ea = wasabi->getEAfromID(newLocalID)) {
                                                         ea->EmoConPerson->dynFilename = word2;
@@ -277,6 +291,17 @@ bool WASABIQtWindow::loadInitFile(int& sPort) {
                                                         if (word2 == "false" || word2 == "0") {
                                                             ea->simulationOn = false; // default value is true, see cogaEmotionalAttendee
                                                         }
+                                                    }
+                                                    break;
+                                                case 5: // xmlFilename
+                                                    if (ea = wasabi->getEAfromID(newLocalID)) {
+                                                        ea->EmoConPerson->xmlFilename = word2;
+                                                    } else {
+                                                        qDebug()
+                                                                << "MyApp::loadInitFile(): ERROR no ea with ID "
+                                                                << newLocalID
+                                                                << " found!"
+                                                                   ;
                                                     }
                                                     break;
                                                 default:
@@ -335,7 +360,7 @@ bool WASABIQtWindow::loadInitFile(int& sPort) {
         qDebug()
                 << "MyApp::loadInitFile: ERROR Could not open file! --> creating dummy JohnDoe :)"
                    ;
-        int newLocalID = wasabi->addEmotionalAttendee("JohnDoe");
+        wasabi->addEmotionalAttendee("JohnDoe");
         return false; //could not open file;
     }
     return true;
@@ -1125,3 +1150,161 @@ void WASABIQtWindow::setQWT(bool state)
     ui->actionPlot->setChecked(state);
 }
 
+/*!
+ * Initializing ea's using the xml file.
+ */
+bool WASABIQtWindow::initEAbyXML(cogaEmotionalAttendee* ea)
+{
+    QString filename = "xml/";
+    filename = filename.append(ea->EmoConPerson->xmlFilename.c_str());
+    QFile file;
+    if (!(file.exists(filename))) {
+        qDebug() << "WASABIQtWindow::initEAbyXML: file " << filename << " not found.";
+        return false;
+    }
+    QXmlStreamReader xml;
+    file.setFileName(filename);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "WASABIQtWindow::initEAbyXML: Could not open " << filename << " read-only in text mode.";
+        return false;
+    }
+    xml.setDevice(&file);
+    if (xml.readNextStartElement()) {
+        std::cout << "xml.name()='''" << xml.name().toString().toStdString() << "'''" << std::endl;
+        if (xml.name() == "emotionml" && xml.attributes().value("version") == "1.0") {
+            qDebug() << "YES !!!!";
+            return readEmotionML(xml, ea);
+        }
+        else
+            xml.raiseError(QObject::tr("The file is not an EMOTIONML version 1.0 file."));
+    }
+
+    return false;
+}
+
+bool WASABIQtWindow::readEmotionML(QXmlStreamReader& xml, cogaEmotionalAttendee* ea) {
+    Q_ASSERT(xml.isStartElement() && xml.name() == "emotionml");
+
+     while (xml.readNextStartElement()) {
+         std::cout << "xml.name()='''" << xml.name().toString().toStdString() << "'''" << std::endl;
+         if (xml.name() == "info")
+             return readInfo(xml, ea);
+         else if (xml.name() == "emotion")
+             return readEmotion(xml, ea);
+         else
+             xml.skipCurrentElement();
+     }
+}
+
+bool WASABIQtWindow::readInfo(QXmlStreamReader& xml, cogaEmotionalAttendee* ea) {
+    Q_ASSERT(xml.isStartElement() && xml.name() == "info");
+
+    while (xml.readNextStartElement()) {
+        std::cout << "xml.name()='''" << xml.name().toString().toStdString() << "'''" << std::endl;
+        std::cout << "xml.namespaceUri()='''" << xml.namespaceUri().toString().toStdString() << "'''" << std::endl;
+        //This results in the http address!
+        if (xml.name() == "parameter") {
+            if (xml.attributes().hasAttribute("type") && xml.attributes().value("type") == "dynamic") {
+                // These are the general dynamic infos
+                std::cout << "xml.attributes().value(\"name\") = " << xml.attributes().value("name").toString().toStdString() << std::endl;
+                QStringRef nameValue = xml.attributes().value("name");
+                bool ok;
+                int value;
+                switch (returnIndex(nameValue.toString().toStdString(), "xTens yTens slope mass xReg yReg boredom prevalence")) {
+                case 1: //xTens
+                    value = xml.attributes().value("value").toInt(&ok);
+                    if (ok) {
+                        std::cout << "setting xTens for EA " << ea->getLocalID() << std::endl;
+                        ea->EmoConPerson->xTens = value;
+                    }
+                    else {
+                        qDebug() << "WASABIQtWindow::readInfo: error converting " << xml.attributes().value("value") << " to integer.";
+                    }
+                    break;
+                 case 2: //yTens
+                    value = xml.attributes().value("value").toInt(&ok);
+                    if (ok) {
+                        std::cout << "setting yTens for EA " << ea->getLocalID() << std::endl;
+                        ea->EmoConPerson->yTens = value;
+                    }
+                    else {
+                        qDebug() << "WASABIQtWindow::readInfo: error converting " << xml.attributes().value("value") << " to integer.";
+                    }
+                    break;
+                case 3: //slope
+                   value = xml.attributes().value("value").toInt(&ok);
+                   if (ok) {
+                       std::cout << "setting slope for EA " << ea->getLocalID() << std::endl;
+                       ea->EmoConPerson->slope = value;
+                   }
+                   else {
+                       qDebug() << "WASABIQtWindow::readInfo: error converting " << xml.attributes().value("value") << " to integer.";
+                   }
+                   break;
+                case 4: //mass
+                   value = xml.attributes().value("value").toInt(&ok);
+                   if (ok) {
+                       std::cout << "setting mass for EA " << ea->getLocalID() << std::endl;
+                       ea->EmoConPerson->mass = value;
+                   }
+                   else {
+                       qDebug() << "WASABIQtWindow::readInfo: error converting " << xml.attributes().value("value") << " to integer.";
+                   }
+                   break;
+                case 5: //xReg
+                   value = xml.attributes().value("value").toInt(&ok);
+                   if (ok) {
+                       std::cout << "setting xReg for EA " << ea->getLocalID() << std::endl;
+                       ea->EmoConPerson->xReg = value;
+                   }
+                   else {
+                       qDebug() << "WASABIQtWindow::readInfo: error converting " << xml.attributes().value("value") << " to integer.";
+                   }
+                   break;
+                case 6: //yReg
+                   value = xml.attributes().value("value").toInt(&ok);
+                   if (ok) {
+                       std::cout << "setting yReg for EA " << ea->getLocalID() << std::endl;
+                       ea->EmoConPerson->yReg = value;
+                   }
+                   else {
+                       qDebug() << "WASABIQtWindow::readInfo: error converting " << xml.attributes().value("value") << " to integer.";
+                   }
+                   break;
+                case 7: //boredom
+                   value = xml.attributes().value("value").toInt(&ok);
+                   if (ok) {
+                       std::cout << "setting boredom for EA " << ea->getLocalID() << std::endl;
+                       ea->EmoConPerson->boredom = value;
+                   }
+                   else {
+                       qDebug() << "WASABIQtWindow::readInfo: error converting " << xml.attributes().value("value") << " to integer.";
+                   }
+                   break;
+                case 8: //prevalence
+                   value = xml.attributes().value("value").toInt(&ok);
+                   if (ok) {
+                       std::cout << "setting prevalence for EA " << ea->getLocalID() << std::endl;
+                       ea->EmoConPerson->prevalence = value;
+                   }
+                   else {
+                       qDebug() << "WASABIQtWindow::readInfo: error converting " << xml.attributes().value("value") << " to integer.";
+                   }
+                   break;
+                default:
+                    qDebug() << "WASABIQtWindow::readInfo: error reading unknown value " << xml.attributes().value("value") << "!";
+                }
+                xml.skipCurrentElement();
+            }
+        }
+    }
+}
+
+bool WASABIQtWindow::readEmotion(QXmlStreamReader& xml, cogaEmotionalAttendee* ea) {
+    Q_ASSERT(xml.isStartElement() && xml.name() == "emotion");
+
+    while (xml.readNextStartElement()) {
+        // TODO
+    }
+
+}

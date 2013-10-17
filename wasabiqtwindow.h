@@ -32,6 +32,7 @@
 #include <QStandardItemModel>
 #include <QTimer>
 #include <QTextEdit>
+#include <QXmlStreamReader>
 
 namespace Ui {
     class WASABIQtWindow;
@@ -147,6 +148,10 @@ private:
     void printNetworkMessage(QString m, bool type, bool success = false, bool parsed = false);
     bool parseMessage(QString data);
     QString *networkOutputFormat;
+    bool initEAbyXML(cogaEmotionalAttendee* ea);
+    bool readEmotionML(QXmlStreamReader& xml, cogaEmotionalAttendee *ea);
+    bool readInfo(QXmlStreamReader& xml, cogaEmotionalAttendee *ea);
+    bool readEmotion(QXmlStreamReader& xml, cogaEmotionalAttendee *ea);
 };
 
 #endif // WASABIQTWINDOW_H
