@@ -16,6 +16,7 @@
 		<wasabi:parameter type="dynamic" name="boredom" value="50"/>
 		<wasabi:parameter type="dynamic" name="prevalence" value="0"/>
 	</info>
+	<!-- NOTE: EmotionML forbids the use of negative values so that the P A D values have to be in the range [0, 1] as well. -->
 	<emotion id="angry" category-set="http://www.w3.org/TR/emotion-voc/xml#fsre-categories">
 		<category name="anger"/>
 		<dimension name="pleasure" value="0.25"/>
