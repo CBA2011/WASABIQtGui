@@ -72,6 +72,26 @@ void myReplace(std::string& str, const std::string& oldStr, const std::string& n
     }
 }
 
+// Used internally to temporarily store data collected from the xml file
+struct emodata {
+    std::string category; // fsre-, occ-, or everyday-category name, e.g. 'relaxed'
+    std::string emoclass; // primary or secondary
+    int xTens;
+    int yTens;
+    int slope;
+    int mass;
+    int xReg;
+    int boredom;
+    int prevalence;
+    float base_intensity;
+    float act_threshold;
+    float sat_threshold;
+    std::string decay;
+    float pleasure, arousal, dominance;
+    float lifetime;
+    std::vector<AffectPolygon*> affect_polygons;
+} tmp_emodata;
+
 WASABIQtWindow::WASABIQtWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::WASABIQtWindow)
@@ -1172,7 +1192,6 @@ bool WASABIQtWindow::initEAbyXML(cogaEmotionalAttendee* ea)
     if (xml.readNextStartElement()) {
         std::cout << "xml.name()='''" << xml.name().toString().toStdString() << "'''" << std::endl;
         if (xml.name() == "emotionml" && xml.attributes().value("version") == "1.0") {
-            qDebug() << "YES !!!!";
             return readEmotionML(xml, ea);
         }
         else
@@ -1185,30 +1204,83 @@ bool WASABIQtWindow::initEAbyXML(cogaEmotionalAttendee* ea)
 bool WASABIQtWindow::readEmotionML(QXmlStreamReader& xml, cogaEmotionalAttendee* ea) {
     Q_ASSERT(xml.isStartElement() && xml.name() == "emotionml");
     bool returnValue = false;
-     while (xml.readNextStartElement()) {
-         std::cout << "xml.name()='''" << xml.name().toString().toStdString() << "'''" << std::endl;
-         if (xml.name() == "info")
-             returnValue = readInfo(xml, ea);
-         else if (xml.name() == "emotion")
-             returnValue = readEmotion(xml, ea);
-         else
-             xml.skipCurrentElement();
-     }
+    tmp_emodata.affect_polygons.clear();
+    tmp_emodata.emoclass = "undef";
+    while (xml.readNextStartElement()) {
+        std::cout << "^^^xml.name()='''" << xml.name().toString().toStdString() << "'''" << std::endl;
+        if (xml.name() == "info")
+            returnValue = readInfo(xml, ea);
+        else if (xml.name() == "emotion") {
+            std::cout << "***WASABIQtWindow::readEmotionML: xml.name()='''" << xml.name().toString().toStdString() << "'''" << std::endl;
+            returnValue = readEmotion(xml, ea);
+            if (returnValue && tmp_emodata.emoclass != "undef") {
+                //We got a primary or secondary emotion
+                if (tmp_emodata.emoclass == "primary") {
+                    std::vector<float> p_a_d_ID_max_min_baseInt;
+                    p_a_d_ID_max_min_baseInt.push_back(tmp_emodata.pleasure);
+                    p_a_d_ID_max_min_baseInt.push_back(tmp_emodata.arousal);
+                    p_a_d_ID_max_min_baseInt.push_back(tmp_emodata.dominance);
+                    p_a_d_ID_max_min_baseInt.push_back(-1); //MOOD_ID is obsolete without agent MAX!
+                    p_a_d_ID_max_min_baseInt.push_back(tmp_emodata.sat_threshold);
+                    p_a_d_ID_max_min_baseInt.push_back(tmp_emodata.act_threshold);
+                    p_a_d_ID_max_min_baseInt.push_back(tmp_emodata.base_intensity);
+                    ea->EmoConPerson->buildPrimaryEmotion(p_a_d_ID_max_min_baseInt, tmp_emodata.category, tmp_emodata.decay);
+                }
+                else if (tmp_emodata.emoclass == "secondary" && tmp_emodata.affect_polygons.size() > 0) {
+                    SecondaryEmotion* se = new SecondaryEmotion();
+                    EmotionDynamics* me = dynamic_cast<EmotionDynamics*>(ea->EmoConPerson);
+                    if (me) {
+                        se->setEmotionContainer(me);
+                    }
+                    se->addPolygon(tmp_emodata.affect_polygons);
+                    if (!se->setStandardLifetime((double)tmp_emodata.lifetime) || !se->setLifetime((double)tmp_emodata.lifetime)) {
+                        cerr << "WASABIQtWindow::readEmotionML: WARNING invalid lifetime " << (double)tmp_emodata.lifetime << endl;
+                    }
+                    if (!se->setBaseIntensity((double)tmp_emodata.base_intensity)) {
+                        cerr << "SecondaryEmotion::loadFromFile: WARNING invalid baseIntensity " << (double)tmp_emodata.base_intensity << endl;
+                    }
+                    se->type = tmp_emodata.category;
+                    if (tmp_emodata.decay == "linear") {
+                        se->setDecayFunction(SecondaryEmotion::LINEAR);
+                    }
+                    else if (tmp_emodata.decay == "none") {
+                        se->setDecayFunction(SecondaryEmotion::NONE);
+                    }
+                    else if (tmp_emodata.decay == "exponential") {
+                        se->setDecayFunction(SecondaryEmotion::EXPONENTIAL);
+                    }
+                    else if (tmp_emodata.decay == "cosine") {
+                        se->setDecayFunction(SecondaryEmotion::COSINE);
+                    }
+                    ea->EmoConPerson->affectiveStates.push_back(se);
+                }
+            }
+        }
+        else
+            xml.skipCurrentElement();
+    }
     return returnValue;
 }
 
 bool WASABIQtWindow::readInfo(QXmlStreamReader& xml, cogaEmotionalAttendee* ea) {
     Q_ASSERT(xml.isStartElement() && xml.name() == "info");
-
-    while (xml.readNextStartElement()) {
-        std::cout << "xml.name()='''" << xml.name().toString().toStdString() << "'''" << std::endl;
-        std::cout << "xml.namespaceUri()='''" << xml.namespaceUri().toString().toStdString() << "'''" << std::endl;
-        if ( xml.namespaceUri().toString().toStdString() != "http://www.becker-asano.de/WASABI/Shema/WASABI") {
-             qDebug() << "WASABIQtWindow::readInfo: wrong namespaceUri, only http://www.becker-asano.de/WASABI/Shema/WASABI allowed:";
-             return false;
+    xml.readNext();
+    std::cout << xml.tokenType() << " tokenType!" << std::endl;
+    while (!(xml.tokenType() == QXmlStreamReader::EndElement &&
+             xml.name() == "info")) {
+        if (xml.name() == "" || xml.tokenType() == QXmlStreamReader::EndElement) {
+            xml.readNext();
+            continue;
         }
+        std::cout << "WASABIQtWindow::readInfo: xml.name()='''" << xml.name().toString().toStdString() << "'''" << std::endl;
+        //std::cout << "WASABIQtWindow::readInfo: xml.namespaceUri()='''" << xml.namespaceUri().toString().toStdString() << "'''" << std::endl;
         //This results in the http address!
         if (xml.name() == "parameter") {
+            if ( xml.namespaceUri().toString().toStdString() != "http://www.becker-asano.de/WASABI/Shema/WASABI") {
+                 std::cout << "WASABIQtWindow::readInfo: wrong namespaceUri, only http://www.becker-asano.de/WASABI/Shema/WASABI allowed:" << std::endl;
+                 xml.readNext();
+                 continue;
+            }
             if (xml.attributes().hasAttribute("type") && xml.attributes().value("type") == "dynamic") {
                 // These are the general dynamic infos
                 std::cout << "xml.attributes().value(\"name\") = " << xml.attributes().value("name").toString().toStdString() << std::endl;
@@ -1299,27 +1371,33 @@ bool WASABIQtWindow::readInfo(QXmlStreamReader& xml, cogaEmotionalAttendee* ea) 
                 default:
                     qDebug() << "WASABIQtWindow::readInfo: error reading unknown value " << xml.attributes().value("value") << "!";
                 }
-                xml.skipCurrentElement();
+                //xml.skipCurrentElement();
             }
             else //i.e. if !(xml.attributes().hasAttribute("type") && xml.attributes().value("type") == "dynamic")
             {
-                qDebug() << "WASABIQtWindow::readInfo: error: only 'parameter' tags with attribute with 'type=dynamic' allowed on top level.";
+                std::cout << "WASABIQtWindow::readInfo: error: only 'parameter' tags with attribute with 'type=dynamic' allowed on top level." << std::endl;
             }
         }
         else if (xml.name() == "primary") {
+            tmp_emodata.emoclass = "primary";
             // We have to parse a primary emotion
-            float max_distance, min_distance, standardIntens;
-            string decayFunction;
-            while (xml.readNextStartElement()) {
-                std::cout << "xml.name()='''" << xml.name().toString().toStdString() << "'''" << std::endl;
-                std::cout << "xml.namespaceUri()='''" << xml.namespaceUri().toString().toStdString() << "'''" << std::endl;
-                if ( xml.namespaceUri().toString().toStdString() != "http://www.becker-asano.de/WASABI/Shema/WASABI") {
-                     qDebug() << "WASABIQtWindow::readInfo: wrong namespaceUri, only http://www.becker-asano.de/WASABI/Shema/WASABI allowed:";
-                     return false;
+            xml.readNext();
+            while (!(xml.tokenType() == QXmlStreamReader::EndElement &&
+                     xml.name() == "primary")) {
+                if (xml.name() == "" || xml.tokenType() == QXmlStreamReader::EndElement) {
+                    xml.readNext();
+                    continue;
                 }
+                std::cout << "xml.name()='''" << xml.name().toString().toStdString() << "''', tokenType = " << xml.tokenType() << std::endl;
                 if (xml.name() == "parameter") {
                     std::cout << "xml.attributes().value(\"name\") = " << xml.attributes().value("name").toString().toStdString() << std::endl;
                     QStringRef nameValue = xml.attributes().value("name");
+                    //std::cout << "xml.namespaceUri()='''" << xml.namespaceUri().toString().toStdString() << "'''" << std::endl;
+                    if ( xml.namespaceUri().toString().toStdString() != "http://www.becker-asano.de/WASABI/Shema/WASABI") {
+                         std::cout << "WASABIQtWindow::readInfo: wrong namespaceUri, only http://www.becker-asano.de/WASABI/Shema/WASABI allowed:" << std::endl;
+                         xml.readNext();
+                         continue;
+                    }
                     bool ok;
                     float value;
                     switch (returnIndex(nameValue.toString().toStdString(), "base_intensity act_threshold sat_threshold decay")) {
@@ -1327,7 +1405,7 @@ bool WASABIQtWindow::readInfo(QXmlStreamReader& xml, cogaEmotionalAttendee* ea) 
                         value = xml.attributes().value("value").toFloat(&ok);
                         if (ok) {
                             std::cout << "setting base_intensity for EA " << ea->getLocalID() << std::endl;
-                            standardIntens = value;
+                            tmp_emodata.base_intensity = value;
                         }
                         else {
                             qDebug() << "WASABIQtWindow::readInfo: error converting " << xml.attributes().value("value") << " to float.";
@@ -1337,7 +1415,7 @@ bool WASABIQtWindow::readInfo(QXmlStreamReader& xml, cogaEmotionalAttendee* ea) 
                         value = xml.attributes().value("value").toFloat(&ok);
                         if (ok) {
                             std::cout << "setting activation threshold for EA " << ea->getLocalID() << std::endl;
-                            min_distance = value;
+                            tmp_emodata.act_threshold = value;
                         }
                         else {
                             qDebug() << "WASABIQtWindow::readInfo: error converting " << xml.attributes().value("value") << " to float.";
@@ -1347,7 +1425,7 @@ bool WASABIQtWindow::readInfo(QXmlStreamReader& xml, cogaEmotionalAttendee* ea) 
                        value = xml.attributes().value("value").toFloat(&ok);
                        if (ok) {
                            std::cout << "setting saturation threshold for EA " << ea->getLocalID() << std::endl;
-                           max_distance = value;
+                           tmp_emodata.sat_threshold = value;
                        }
                        else {
                            qDebug() << "WASABIQtWindow::readInfo: error converting " << xml.attributes().value("value") << " to float.";
@@ -1355,36 +1433,158 @@ bool WASABIQtWindow::readInfo(QXmlStreamReader& xml, cogaEmotionalAttendee* ea) 
                        break;
                     case 4: //decay
                        std::cout << "setting decay function for EA " << ea->getLocalID() << std::endl;
-                       decayFunction = xml.attributes().value("value").toString().toStdString();
+                       tmp_emodata.decay = xml.attributes().value("value").toString().toStdString();
                        break;
                     default:
-                        qDebug() << "WASABIQtWindow::readInfo: error reading incorrect parameter value " << xml.attributes().value("value") << "!";
+                        qDebug() << "WASABIQtWindow::readInfo: (primary) error reading incorrect parameter value " << xml.attributes().value("value") << "!";
                     }
                 }
-                xml.skipCurrentElement();
+                xml.readNext();
             }
         }
+        else if (xml.name() == "secondary") {
+            // We have to parse a primary emotion
+            tmp_emodata.emoclass = "secondary";
+            tmp_emodata.affect_polygons.clear();
+            xml.readNext();
+            while (!(xml.tokenType() == QXmlStreamReader::EndElement &&
+                     xml.name() == "secondary") && xml.tokenType() != QXmlStreamReader::Invalid) {
+                if (xml.name() == "" || xml.tokenType() == QXmlStreamReader::EndElement) {
+                    xml.readNext();
+                    continue;
+                }
+                std::cout << "xml.name()='''" << xml.name().toString().toStdString() << "''', tokenType = " << xml.tokenType() << std::endl;
+                //std::cout << "xml.namespaceUri()='''" << xml.namespaceUri().toString().toStdString() << "'''" << std::endl;
+                if ( xml.namespaceUri().toString().toStdString() != "http://www.becker-asano.de/WASABI/Shema/WASABI") {
+                     std::cout << "WASABIQtWindow::readInfo: wrong namespaceUri, only http://www.becker-asano.de/WASABI/Shema/WASABI allowed:" << std::endl;
+                     xml.readNext();
+                     continue;
+                }
+                if (xml.name() == "parameter") {
+                    std::cout << "xml.attributes().value(\"name\") = " << xml.attributes().value("name").toString().toStdString() << std::endl;
+                    QStringRef nameValue = xml.attributes().value("name");
+                    bool ok;
+                    float value;
+                    switch (returnIndex(nameValue.toString().toStdString(), "base_intensity lifetime decay")) {
+                    case 1: //base_intensity
+                        value = xml.attributes().value("value").toFloat(&ok);
+                        if (ok) {
+                            std::cout << "setting base_intensity for EA " << ea->getLocalID() << std::endl;
+                            tmp_emodata.base_intensity = value;
+                        }
+                        else {
+                            qDebug() << "WASABIQtWindow::readInfo: error converting " << xml.attributes().value("value") << " to float.";
+                        }
+                        break;
+                     case 2: //lifetime
+                        value = xml.attributes().value("value").toFloat(&ok);
+                        if (ok) {
+                            std::cout << "setting lifetime threshold for EA " << ea->getLocalID() << std::endl;
+                            tmp_emodata.lifetime = value;
+                        }
+                        else {
+                            qDebug() << "WASABIQtWindow::readInfo: error converting " << xml.attributes().value("value") << " to float.";
+                        }
+                        break;
+                    case 3: //decay
+                       std::cout << "setting decay function for EA " << ea->getLocalID() << std::endl;
+                       tmp_emodata.decay = xml.attributes().value("value").toString().toStdString();
+                       break;
+                    default:
+                        qDebug() << "WASABIQtWindow::readInfo: (secondary) error reading incorrect parameter value " << xml.attributes().value("value") << "!";
+                    }
+                }
+                else if(xml.name() == "polygon"){
+                    // We have to parse a primary emotion
+                    QStringRef type = xml.attributes().value("type");
+                    if (type != "QUAD") {
+                        std::cout << "WASABIQtWindow::readInfo: wrong type '''" << type.toString().toStdString() << "''' for polygon" << std::endl;
+                        break;
+                    }
+                    std::vector<AffectVertex*> affect_vertices;
+                    xml.readNext();
+                    while (!(xml.tokenType() == QXmlStreamReader::EndElement &&
+                             xml.name() == "polygon")) {
+                        if (xml.name() == "" || xml.tokenType() == QXmlStreamReader::EndElement) {
+                            xml.readNext();
+                            continue;
+                        }
+                        std::cout << "xml.name()='''" << xml.name().toString().toStdString() << "''', tokenType = " << xml.tokenType() << std::endl;
+                        //std::cout << "xml.namespaceUri()='''" << xml.namespaceUri().toString().toStdString() << "'''" << std::endl;
+                        if ( xml.namespaceUri().toString().toStdString() != "http://www.becker-asano.de/WASABI/Shema/WASABI") {
+                             qDebug() << "WASABIQtWindow::readInfo: wrong namespaceUri, only http://www.becker-asano.de/WASABI/Shema/WASABI allowed:";
+                             xml.readNext();
+                             continue;
+                        }
+                        if (xml.name() == "vertex") {
+
+                            if (xml.attributes().hasAttribute("pleasure") && xml.attributes().hasAttribute("arousal") && xml.attributes().hasAttribute("dominance") && xml.attributes().hasAttribute("intensity")) {
+                                float pad_f[3]; //pleasure, arousal, dominance;
+                                int pad[3];
+                                float intensity;
+                                bool ok;
+                                pad_f[0] = xml.attributes().value("pleasure").toFloat(&ok);
+                                if (ok) {
+                                    pad[0] = (int)((pad_f[0] * 2 - 1.0) * 100); // old range [0.0, 1.0], new range [-100, 100]
+                                    pad_f[1] = xml.attributes().value("arousal").toFloat(&ok);
+                                    if (ok) {
+                                        pad[1] = (int)((pad_f[1] * 2 - 1.0) * 100);
+                                        pad_f[2] = xml.attributes().value("dominance").toFloat(&ok);
+                                        if (ok) {
+                                            pad[2] = (int)((pad_f[2] * 2 - 1.0) * 100);
+                                            intensity = xml.attributes().value("intensity").toFloat(&ok);
+                                            if (ok) {
+                                                affect_vertices.push_back(new AffectVertex(pad, (double)intensity));
+                                            }
+                                        }
+                                    }
+                                }
+                                if (!ok) {
+                                    std::cout << "WASABIQtWindow::readInfo: at least one dimension or intensity was not a float value!" << std::endl;
+                                }
+                            }
+                            else {
+                                std::cout << "WASABIQtWindow::readInfo: at least one dimension or intensity is missing in vertex defnition" << std::endl;
+                            }
+                        }
+                        xml.readNext();
+                    }
+                    if (affect_vertices.size() > 0) {
+                        AffectPolygon* ap = new AffectPolygon(affect_vertices, "QUAD");
+                        tmp_emodata.affect_polygons.push_back(ap);
+                    }
+                }
+                xml.readNext();
+            }
+        }
+        xml.readNext();
     }
     return true;
 }
 
 bool WASABIQtWindow::readEmotion(QXmlStreamReader& xml, cogaEmotionalAttendee* ea) {
     Q_ASSERT(xml.isStartElement() && xml.name() == "emotion");
-    bool returnValue = false;
-    float P, A, D;
-    string category;
-    std::vector<float> v;
-    while (xml.readNextStartElement()) {
-        std::cout << "xml.name()='''" << xml.name().toString().toStdString() << "'''" << std::endl;
-        if (xml.name() == "info")
+    bool returnValue = false;;
+    xml.readNext();
+    while (!(xml.tokenType() == QXmlStreamReader::EndElement &&
+             xml.name() == "emotion")) {
+        if (xml.name() == "" || xml.tokenType() == QXmlStreamReader::EndElement) {
+            xml.readNext();
+            continue;
+        }
+        std::cout << "WASABIQtWindow::readEmotion xml.name()='''" << xml.name().toString().toStdString() << "'''" << std::endl;
+        if (xml.name() == "info") {
+            std::cout << "------------------inner readInfo start--------------------" << std::endl;
             returnValue = readInfo(xml, ea);
+            std::cout << "------------------inner readInfo end  --------------------" << std::endl;
+        }
         else if (xml.name() == "category") {
-            std::cout << "xml.attributes().value(\"name\") = " << xml.attributes().value("name").toString().toStdString() << std::endl;
-            category = xml.attributes().value("name").toString().toStdString();
+            std::cout << "WASABIQtWindow::readEmotion xml.attributes().value(\"name\") = " << xml.attributes().value("name").toString().toStdString() << std::endl;
+            tmp_emodata.category = xml.attributes().value("name").toString().toStdString();
             returnValue = true;
         }
         else if (xml.name() == "dimension") {
-            std::cout << "xml.attributes().value(\"name\") = " << xml.attributes().value("name").toString().toStdString() << std::endl;
+            std::cout << "WASABIQtWindow::readEmotion xml.attributes().value(\"name\") = " << xml.attributes().value("name").toString().toStdString() << std::endl;
             QStringRef nameValue = xml.attributes().value("name");
             bool ok;
             float value;
@@ -1394,8 +1594,8 @@ bool WASABIQtWindow::readEmotion(QXmlStreamReader& xml, cogaEmotionalAttendee* e
                 value = xml.attributes().value("value").toFloat(&ok);
                 if (ok) {
                     value = value * 2 -1;
-                    std::cout << "setting pleasure for EA " << ea->getLocalID() << " with emotion " << category << "." << std::endl;
-                    P = value;
+                    std::cout << "setting pleasure for EA " << ea->getLocalID() << " with emotion " << tmp_emodata.category << "." << std::endl;
+                    tmp_emodata.pleasure = value;
                 }
                 else {
                     qDebug() << "WASABIQtWindow::readInfo: error converting " << xml.attributes().value("value") << " to float.";
@@ -1405,8 +1605,8 @@ bool WASABIQtWindow::readEmotion(QXmlStreamReader& xml, cogaEmotionalAttendee* e
                 value = xml.attributes().value("value").toFloat(&ok);
                 if (ok) {
                     value = value * 2 -1;
-                    std::cout << "setting arousal for EA " << ea->getLocalID() << " with emotion " << category << "." << std::endl;
-                    A = value;
+                    std::cout << "setting arousal for EA " << ea->getLocalID() << " with emotion " << tmp_emodata.category << "." << std::endl;
+                    tmp_emodata.arousal = value;
                 }
                 else {
                     qDebug() << "WASABIQtWindow::readInfo: error converting " << xml.attributes().value("value") << " to float.";
@@ -1416,8 +1616,8 @@ bool WASABIQtWindow::readEmotion(QXmlStreamReader& xml, cogaEmotionalAttendee* e
                value = xml.attributes().value("value").toFloat(&ok);
                if (ok) {
                    value = value * 2 -1;
-                   std::cout << "setting dominance for EA " << ea->getLocalID() << " with emotion " << category << "." << std::endl;
-                   D = value;
+                   std::cout << "setting dominance for EA " << ea->getLocalID() << " with emotion " << tmp_emodata.category << "." << std::endl;
+                   tmp_emodata.dominance = value;
                }
                else {
                    qDebug() << "WASABIQtWindow::readInfo: error converting " << xml.attributes().value("value") << " to float.";
@@ -1426,11 +1626,16 @@ bool WASABIQtWindow::readEmotion(QXmlStreamReader& xml, cogaEmotionalAttendee* e
             default:
                 qDebug() << "WASABIQtWindow::readInfo: error reading incorrect parameter value " << xml.attributes().value("value") << "!";
             }
-
             returnValue = true;
         }
-        else
-            xml.skipCurrentElement();
+        //else {
+            //xml.skipCurrentElement();
+        //}
+        //xml.skipCurrentElement();
+        xml.readNext();
+        if (xml.tokenType() == QXmlStreamReader::StartElement || xml.tokenType() == QXmlStreamReader::Invalid) {
+            std::cout << "WASABIQtWindow::readEmotion StartElement with name " << xml.name().toString().toStdString() << std::endl;
+        }
     }
     return returnValue;
 }
