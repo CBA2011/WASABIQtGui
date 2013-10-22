@@ -45,23 +45,26 @@ C3. change to the release configuration (left panel button)
 C4. press the play button to compile and run.
 ===
 
-NEW instructions for the qt-project.org-Version of Qt5:
+NEW instructions for the qt-project.org-Version of Qt5 (UPDATED 22nd of October, 2013):
 ===
 A1. Open the file "WASABIGuiQt.pro" by double clicking on it.
 A2. use the default configuration for "Desktop Qt 5.1.0 MinGW 32bit" with two seperate directories for "Debug" and "Release".
     That looks something like "../build-WASABIGuiQt-Desktop_Qt_5_1_0_MinGW_32bit-Debug" and "../build-WASABIGuiQt-Desktop_Qt_5_1_0_MinGW_32bit-Release" for me.
 A3. Try to compile in Debug mode and you will get a message like "cannot find -lWASABIEngine".
 B1. Open the file "WASABIEngine/WASABIEngine.pro".
-B2. IMPORTANT: Manually change the build directories for Debug and Release to the folders "WASABIEngine/debug" and "WASABIEngine/release", resp. Ignore the qmake warning.
+B2. Leave the build-paths as is. In my case it looks like
+    <path\to\git-working-dir>\WASABIQtGui\build-WASABIEngine-Desktop_Qt_5_1_1_MinGW_32bit-[Debug/Release].
 B3. Change to "Debug" mode on the left panel (the Computer screen button), and hit "build" (the hammer button).
-	This should result in the file "WASABIEngine/debug/WASABIEngine.dll".
+	This should result in the file "../build-WASABIEngine-Desktop_Qt_5_1_1_MinGW_32bit-Debug/debug/WASABIEngine.dll".
+	Similarly, you may try to build the release version.
 C1. Open the file "WASABI-qwt-clone/qwt-code/qwt/qwt.pro", 
-C2. AGAIN: Change both build directories for Debug and Release to "WASABI-qwt-clone/qwt-code/qwt/lib".
+C2. IMPORTANT: Change both build directories for Debug and Release to "WASABI-qwt-clone/qwt-code/qwt/lib".
 C3. Change to "Debug" mode again, and hit "build".
 	This takes some time, because all the qwt projects are compiled as well.
 C4. You might need to add an environment variable LIBRARY_PATH, which points to "C:\Qt\Qt5.1.1\5.1.1\mingw48_32\bin" in my case.
     Otherwise, some libraries might not be found during linking.
-A4. Finally, make the WASABIGuiQt project the active project by right-clicking on it in the "Projects" pane and selecting the corresponding option.
+A4. Finally, make the WASABIGuiQt project the active project by right-clicking on it in the "Projects" pane 
+    and selecting the corresponding option.
 A5. Press the green "Play" button to the left.
 	You will be presented with an error message like "Unable to load WASABI.ini", because the following files need to be copied to the folder indicated in that message:
 	- WASABI.ini
@@ -106,6 +109,16 @@ In case of a linux environment, I found that the "WASABIGuiQt" executable seems 
 2. Documentation
 I used doxygen to compile an html documentation from the source code. It can be found in
 "WASABIEngine\doxygen\html".
+
+3. Using git to commit (locally) and push (to global repository):
+Recently, TortoiseGit started to ask me for my login credentials, which was not the case so far. To fix this, proceed as follows:
+a. start the "Git Bash" by pressing the Windows-Key and typing "git" in the search field.
+b. change into the directory with your git project, e.g., "cd d:basano/Documents/Git/Test/WASABIQtGui"
+c. type "git remote set-url origin git@github.com:<username>/<repo.git>" with <username> and <repo.git> changed accordingly, e.g.,
+   git remote set-url origin git@github.com:CBA2011/WASABIQtGui.git
+
+Then, you will be asked to provide your pasphrase for your ssh-key again.
+Please also check this https://help.github.com/articles/set-up-git page.
 
 3. Additional information
 To get additional information about WASABI, reading my PhD thesis might be helpful.
