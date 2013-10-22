@@ -45,23 +45,26 @@ C3. change to the release configuration (left panel button)
 C4. press the play button to compile and run.
 ===
 
-NEW instructions for the qt-project.org-Version of Qt5:
+NEW instructions for the qt-project.org-Version of Qt5 (UPDATED 22nd of October, 2013):
 ===
 A1. Open the file "WASABIGuiQt.pro" by double clicking on it.
 A2. use the default configuration for "Desktop Qt 5.1.0 MinGW 32bit" with two seperate directories for "Debug" and "Release".
     That looks something like "../build-WASABIGuiQt-Desktop_Qt_5_1_0_MinGW_32bit-Debug" and "../build-WASABIGuiQt-Desktop_Qt_5_1_0_MinGW_32bit-Release" for me.
 A3. Try to compile in Debug mode and you will get a message like "cannot find -lWASABIEngine".
 B1. Open the file "WASABIEngine/WASABIEngine.pro".
-B2. IMPORTANT: Manually change the build directories for Debug and Release to the folders "WASABIEngine/debug" and "WASABIEngine/release", resp. Ignore the qmake warning.
+B2. Leave the build-paths as is. In my case it looks like
+    <path\to\git-working-dir>\WASABIQtGui\build-WASABIEngine-Desktop_Qt_5_1_1_MinGW_32bit-[Debug/Release].
 B3. Change to "Debug" mode on the left panel (the Computer screen button), and hit "build" (the hammer button).
-	This should result in the file "WASABIEngine/debug/WASABIEngine.dll".
+	This should result in the file "../build-WASABIEngine-Desktop_Qt_5_1_1_MinGW_32bit-Debug/debug/WASABIEngine.dll".
+	Similarly, you may try to build the release version.
 C1. Open the file "WASABI-qwt-clone/qwt-code/qwt/qwt.pro", 
-C2. AGAIN: Change both build directories for Debug and Release to "WASABI-qwt-clone/qwt-code/qwt/lib".
+C2. IMPORTANT: Change both build directories for Debug and Release to "WASABI-qwt-clone/qwt-code/qwt/lib".
 C3. Change to "Debug" mode again, and hit "build".
 	This takes some time, because all the qwt projects are compiled as well.
 C4. You might need to add an environment variable LIBRARY_PATH, which points to "C:\Qt\Qt5.1.1\5.1.1\mingw48_32\bin" in my case.
     Otherwise, some libraries might not be found during linking.
-A4. Finally, make the WASABIGuiQt project the active project by right-clicking on it in the "Projects" pane and selecting the corresponding option.
+A4. Finally, make the WASABIGuiQt project the active project by right-clicking on it in the "Projects" pane 
+    and selecting the corresponding option.
 A5. Press the green "Play" button to the left.
 	You will be presented with an error message like "Unable to load WASABI.ini", because the following files need to be copied to the folder indicated in that message:
 	- WASABI.ini
@@ -70,7 +73,7 @@ A5. Press the green "Play" button to the left.
 	- *.se
 	They can be found in the main folder of the project.
 
-Take a look at the WASABIGuiQt.pro file, if you run into trouble. The system expects to find the "WASABIEngine.dll" in the directory "WASABIEngine/release" subdirectory. The qwt.dll should reside in the "WASABI-qwt-clone/qwt-code/qwt/lib" subdirectory.
+Take a look at the WASABIGuiQt.pro file, if you run into trouble. The system expects to find the "WASABIEngine.dll" in the directory "../build-WASABIEngine-Desktop_Qt_5_1_1_MinGW_32bit-[Debug/Release]/[debug/release]" subdirectory. The qwt.dll should reside in the "WASABI-qwt-clone/qwt-code/qwt/lib" subdirectory.
 
 -- (Ubuntu) Linux --
 
