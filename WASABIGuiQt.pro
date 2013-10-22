@@ -30,6 +30,7 @@ CONFIG(debug, debug|release) {
 # win32-g++:LIBS += -lqwt
 # unix:!symbian|win32: LIBS += -L$$PWD/WASABIEngine/ -lWASABIEngine
 
+
 SOURCES += main.cpp\
         wasabiqtwindow.cpp \
     padwindow.cpp \
