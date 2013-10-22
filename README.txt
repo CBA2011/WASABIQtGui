@@ -99,6 +99,16 @@ In case of a linux environment, I found that the "WASABIGuiQt" executable seems 
 I used doxygen to compile an html documentation from the source code. It can be found in
 "WASABIEngine\doxygen\html".
 
+3. Using git to commit (locally) and push (to global repository):
+Recently, TortoiseGit started to ask me for my login credentials, which was not the case so far. To fix this, proceed as follows:
+a. start the "Git Bash" by pressing the Windows-Key and typing "git" in the search field.
+b. change into the directory with your git project, e.g., "cd d:basano/Documents/Git/Test/WASABIQtGui"
+c. type "git remote set-url origin git@github.com:<username>/<repo.git>" with <username> and <repo.git> changed accordingly, e.g.,
+   git remote set-url origin git@github.com:CBA2011/WASABIQtGui.git
+
+Then, you will be asked to provide your pasphrase for your ssh-key again.
+Please also check this https://help.github.com/articles/set-up-git page.
+
 3. Additional information
 To get additional information about WASABI, reading my PhD thesis might be helpful.
 @phdthesis{
