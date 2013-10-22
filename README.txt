@@ -12,9 +12,9 @@ Contact: Christian Becker-Asano (christian (at) becker-asano (dot) de)
 
 1a. Setup
 
-As of July 2013, this program can be compiled as using "Qt Creator" version 2.7.2 available here: 
+As of October 2013, this program can be compiled as using "Qt Creator" version 2.8.1 available here: 
 http://qt-project.org/downloads
-Internally it uses MinGW gcc 4.8.0 for Qt5.1.0 (under MS Windows 7). 
+Internally it is based on Qt5.1.1 (under MS Windows 7, built on Aug 26 2013).
 Older versions of Qt shipping with older versions of the Qt Creator might work as well, but lately I ran into serious trouble with the Nokia SDK version. Thus, I switched to the qt-project.org version of Qt5.
 
 It depends on Qt, OpenGL, QWT (http://qwt.sourceforge.net/), and the WASABIEngine as dynamically linked libraries. The first two come with the Qt SDK. The last two are integrated as submodules.
@@ -72,8 +72,17 @@ A5. Press the green "Play" button to the left.
 	- *.emo_pad
 	- *.se
 	They can be found in the main folder of the project.
+	
+	UPDATE Oct 2013: Alternatively, you can copy the "xml" subfolder with all its contents into the build directory. Then, the file WASABI_agent_default.xml can be referenced in the WASABI.ini (as it currently is) and all data will be loaded from there. The xml file conforms the EmotionML standard (http://www.w3.org/TR/emotionml/).
+	Optionally, you can automate this copy process by adding a "Custom Process Step" in the projects "Build Settings" dialog in QtCreator.
+	Command: cp.exe
+	Arguments: -r ../WASABIQtGui/WASABI.ini ../WASABIQtGui/xml .
+	Working directory: %{buildDir}
+	
+	In the end of the build process, you should find the following line in the Compile Output now: 
+	"Starting: "C:\MinGW\msys\1.0\bin\cp.exe" -r ../WASABIQtGui/WASABI.ini ../WASABIQtGui/xml ."
 
-Take a look at the WASABIGuiQt.pro file, if you run into trouble. The system expects to find the "WASABIEngine.dll" in the directory "../build-WASABIEngine-Desktop_Qt_5_1_1_MinGW_32bit-[Debug/Release]/[debug/release]" subdirectory. The qwt.dll should reside in the "WASABI-qwt-clone/qwt-code/qwt/lib" subdirectory.
+Take a look at the WASABIGuiQt.pro file, if you run into trouble. 
 
 -- (Ubuntu) Linux --
 
@@ -89,6 +98,8 @@ Starting directly from within QtCreator should work out-of-the-box. If you want 
 - *.emo_pad
 - *.se
 These file(types) can be found in the source folder alongside the sources.
+
+UPDATE Oct 2013: Alternatively, you can copy the "xml" subfolder with all its contents into the build directory. Then, the file WASABI_agent_default.xml can be referenced in the WASABI.ini (as it currently is) and all data will be loaded from there. The xml file conforms the EmotionML standard (http://www.w3.org/TR/emotionml/).
 
 -- Linux --
 

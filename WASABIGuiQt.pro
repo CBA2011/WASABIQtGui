@@ -56,4 +56,3 @@ OTHER_FILES += \
     Becker-Asano.emo_dyn \
     README.txt
 
-
