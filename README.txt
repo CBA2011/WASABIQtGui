@@ -52,10 +52,11 @@ A2. use the default configuration for "Desktop Qt 5.1.0 MinGW 32bit" with two se
     That looks something like "../build-WASABIGuiQt-Desktop_Qt_5_1_0_MinGW_32bit-Debug" and "../build-WASABIGuiQt-Desktop_Qt_5_1_0_MinGW_32bit-Release" for me.
 A3. Try to compile in Debug mode and you will get a message like "cannot find -lWASABIEngine".
 B1. Open the file "WASABIEngine/WASABIEngine.pro".
-B2. Leave the build-paths as is. In my case it looks like
-    <path\to\git-working-dir>\WASABIQtGui\build-WASABIEngine-Desktop_Qt_5_1_1_MinGW_32bit-[Debug/Release].
+B2. Change both build-paths for debug and release to:
+    <path\to\git-working-dir>\WASABIQtGui\build-WASABIEngine
+    The WASABIEngine builds will then reside in the (newly created) subdirectories "debug" and "release".
 B3. Change to "Debug" mode on the left panel (the Computer screen button), and hit "build" (the hammer button).
-	This should result in the file "../build-WASABIEngine-Desktop_Qt_5_1_1_MinGW_32bit-Debug/debug/WASABIEngine.dll".
+	This should result in the file "../build-WASABIEngine/debug/WASABIEngine.dll".
 	Similarly, you may try to build the release version.
 C1. Open the file "WASABI-qwt-clone/qwt-code/qwt/qwt.pro", 
 C2. IMPORTANT: Change both build directories for Debug and Release to "WASABI-qwt-clone/qwt-code/qwt/lib".
