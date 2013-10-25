@@ -17,11 +17,11 @@ DEPENDPATH += . $$_PRO_FILE_PWD_/WASABIEngine $$_PRO_FILE_PWD_/WASABI-qwt-clone/
 INCLUDEPATH +=  $$_PRO_FILE_PWD_/WASABIEngine
 INCLUDEPATH +=  $$_PRO_FILE_PWD_/WASABI-qwt-clone/qwt-code/qwt/src
 CONFIG(release, debug|release) {
-    win32-g++:LIBS += -L"$$_PRO_FILE_PWD_/build-WASABIEngine-Desktop_Qt_5_1_1_MinGW_32bit-Release/release" -lWASABIEngine
+    win32-g++:LIBS += -L"$$_PRO_FILE_PWD_/build-WASABIEngine/release" -lWASABIEngine
     win32-g++:LIBS += -L"$$_PRO_FILE_PWD_/WASABI-qwt-clone/qwt-code/qwt/lib" -lqwt
 }
 CONFIG(debug, debug|release) {
-    win32-g++:LIBS += -L"$$_PRO_FILE_PWD_/build-WASABIEngine-Desktop_Qt_5_1_1_MinGW_32bit-Debug/debug" -lWASABIEngine
+    win32-g++:LIBS += -L"$$_PRO_FILE_PWD_/build-WASABIEngine/debug" -lWASABIEngine
     win32-g++:LIBS += -L"$$_PRO_FILE_PWD_/WASABI-qwt-clone/qwt-code/qwt/lib" -lqwtd
 }
 # win32-g++:LIBS += -L"$$_PRO_FILE_PWD_/WASABI-qwt-clone/qwt-code/qwt/lib" -lqwtmathml

@@ -112,6 +112,17 @@ WASABIQtWindow::WASABIQtWindow(QWidget *parent) :
     qDebug() << "Hello World " << dir.currentPath();
     sPort = 42424;
 
+    // Create the qwt-based plotter window
+    qwtPlotterWindow = new WASABIqwtPlotter(this, wasabi);
+    qwtPlotterWindow->resize(qwtPlotterWindow->sizeHint());
+    // The plotter is under construction
+    //qwtPlotterWindow->show();
+
+    // Create the pad space OpenGL-window
+    padWindow = new PADWindow(this, this);
+    padWindow->resize(padWindow->sizeHint());
+    padWindow->show();
+
     if (!loadInitFile(sPort)) {
         qDebug() << "WASABIQtWindow::WASABIQtWindow: unable to load WASABI.ini or something went wrong!";
         QErrorMessage *error = new QErrorMessage(this);
@@ -134,23 +145,20 @@ WASABIQtWindow::WASABIQtWindow(QWidget *parent) :
         if (!(ea->initialized)){
             qDebug() << "WASABIQtWindow::Trying to initialize EA " << ea->getLocalID() << " with xml file " << ea->EmoConPerson->xmlFilename.c_str();
             if (initEAbyXML(ea)) {
-                qDebug() << "WASABIQtWindow::success!";
+                std::cout << "WASABIQtWindow: xml initialization successful!" << std::endl;
+            }
+            else {
+                std::cerr << "WASABIQtWindow: xml initialization FAILED!!!" << std::endl;
+                QErrorMessage *error = new QErrorMessage(this);
+                QString errorMessage;
+                errorMessage.append("Failure to load ").append(ea->EmoConPerson->xmlFilename.c_str()).append(", (which should be in ").append(dir.currentPath()).append("/xml/)!");
+                error->showMessage(errorMessage);
             }
         }
     }
 
     comboBoxAttendee_update();
     initValues(wasabi->getEAfromID());
-
-    // Create the pad space OpenGL-window
-    padWindow = new PADWindow(this, this);
-    padWindow->resize(padWindow->sizeHint());
-    padWindow->show();
-
-    // Create the qwt-based plotter window
-    qwtPlotterWindow = new WASABIqwtPlotter(this, wasabi);
-    qwtPlotterWindow->resize(qwtPlotterWindow->sizeHint());
-    qwtPlotterWindow->show();
 
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
@@ -263,6 +271,7 @@ bool WASABIQtWindow::loadInitFile(int& sPort) {
                             if (newLocalID = wasabi->addEmotionalAttendee(word2)) {
                                 qDebug() << "newLocalID assigned to " << QString(word2.c_str()) << " is " << newLocalID;
                                 // The EA was just initialized with "init.[dyn|pad]" files automatically
+                                bool initByXML = false; // We set this to true, when an 'xmlFilename' key was found.
                                 while (std::getline(file, line) && trim(line) != "EA_END") { // We stop if a line starts with EA_END, see above
                                     line = trim(line);
                                     if (!line.empty() && (line.at(0)) != '#') { //comments begin with '#'
@@ -271,10 +280,11 @@ bool WASABIQtWindow::loadInitFile(int& sPort) {
                                         isline >> word1;
                                         if (!(word1.empty())) {
                                             isline >> word2;
+                                            ea = wasabi->getEAfromID(newLocalID);
                                             if (!(word2.empty())) {
                                                 switch (returnIndex(word1, "dynFilename padFilename globalID simulationOn xmlFilename")) {
                                                 case 1: // dynFilename
-                                                    if (ea = wasabi->getEAfromID(newLocalID)) {
+                                                    if (ea && !initByXML ) {
                                                         ea->EmoConPerson->dynFilename = word2;
                                                     } else {
                                                         qDebug()
@@ -285,7 +295,7 @@ bool WASABIQtWindow::loadInitFile(int& sPort) {
                                                     }
                                                     break;
                                                 case 2: // padFilename
-                                                    if (ea = wasabi->getEAfromID(newLocalID)) {
+                                                    if (ea && !initByXML) {
                                                         ea->EmoConPerson->padFilename = word2;
                                                     } else {
                                                         qDebug()
@@ -296,7 +306,7 @@ bool WASABIQtWindow::loadInitFile(int& sPort) {
                                                     }
                                                     break;
                                                 case 3: //globalID
-                                                    if (ea = wasabi->getEAfromID(newLocalID)) {
+                                                    if (ea) {
                                                         ea->setGlobalID(word2);
                                                     } else {
                                                         qDebug()
@@ -307,15 +317,16 @@ bool WASABIQtWindow::loadInitFile(int& sPort) {
                                                     }
                                                     break;
                                                 case 4: // simulationOn
-                                                    if (ea = wasabi->getEAfromID(newLocalID)) {
+                                                    if (ea) {
                                                         if (word2 == "false" || word2 == "0") {
                                                             ea->simulationOn = false; // default value is true, see cogaEmotionalAttendee
                                                         }
                                                     }
                                                     break;
                                                 case 5: // xmlFilename
-                                                    if (ea = wasabi->getEAfromID(newLocalID)) {
+                                                    if (ea) {
                                                         ea->EmoConPerson->xmlFilename = word2;
+                                                        initByXML = true;
                                                     } else {
                                                         qDebug()
                                                                 << "MyApp::loadInitFile(): ERROR no ea with ID "
@@ -1197,7 +1208,6 @@ bool WASABIQtWindow::initEAbyXML(cogaEmotionalAttendee* ea)
         else
             xml.raiseError(QObject::tr("The file is not an EMOTIONML version 1.0 file."));
     }
-
     return false;
 }
 
@@ -1579,17 +1589,28 @@ bool WASABIQtWindow::readEmotion(QXmlStreamReader& xml, cogaEmotionalAttendee* e
             std::cout << "------------------inner readInfo end  --------------------" << std::endl;
         }
         else if (xml.name() == "category") {
-            std::cout << "WASABIQtWindow::readEmotion xml.attributes().value(\"name\") = " << xml.attributes().value("name").toString().toStdString() << std::endl;
+            std::string attrname = xml.attributes().value("name").toString().toStdString();
+            std::cout << "WASABIQtWindow::readEmotion xml.attributes().value(\"name\") = " << attrname << std::endl;
+            if (attrname.length() == 0) {
+                std::cerr << "Attribute " << attrname << ".length() == 0!, bailing out." << std::endl;
+                returnValue = false;
+                break;
+            }
             tmp_emodata.category = xml.attributes().value("name").toString().toStdString();
             returnValue = true;
         }
         else if (xml.name() == "dimension") {
-            std::cout << "WASABIQtWindow::readEmotion xml.attributes().value(\"name\") = " << xml.attributes().value("name").toString().toStdString() << std::endl;
-            QStringRef nameValue = xml.attributes().value("name");
+            std::string attrname = xml.attributes().value("name").toString().toStdString();
+            std::cout << "WASABIQtWindow::readEmotion xml.attributes().value(\"name\") = " << attrname << std::endl;
+            if (attrname.length() == 0) {
+                std::cerr << "Attribute " << attrname << ".length() == 0!, bailing out." << std::endl;
+                returnValue = false;
+                break;
+            }
             bool ok;
             float value;
             // We have to rescale these values from [0, 1] to [-1, 1] !!!
-            switch (returnIndex(nameValue.toString().toStdString(), "pleasure arousal dominance")) {
+            switch (returnIndex(attrname, "pleasure arousal dominance")) {
             case 1: //pleasure
                 value = xml.attributes().value("value").toFloat(&ok);
                 if (ok) {
@@ -1633,8 +1654,13 @@ bool WASABIQtWindow::readEmotion(QXmlStreamReader& xml, cogaEmotionalAttendee* e
         //}
         //xml.skipCurrentElement();
         xml.readNext();
-        if (xml.tokenType() == QXmlStreamReader::StartElement || xml.tokenType() == QXmlStreamReader::Invalid) {
+        if (xml.tokenType() == QXmlStreamReader::StartElement) {
             std::cout << "WASABIQtWindow::readEmotion StartElement with name " << xml.name().toString().toStdString() << std::endl;
+        }
+        if (xml.tokenType() == QXmlStreamReader::Invalid) {
+            std::cerr << "WASABIQtWindow::readEmotion Invalid element, bailing out! " << std::endl;
+            returnValue = false;
+            break;
         }
     }
     return returnValue;
