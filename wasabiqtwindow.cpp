@@ -100,7 +100,7 @@ WASABIQtWindow::WASABIQtWindow(QWidget *parent) :
     //setCentralWidget(ui->tabWidgetMain); // DON'T EVER DO THIS! Otherwise other parts are invisible!!!
     globalInitFilename = "WASABI.ini";
     wasabi = new WASABIEngine("secondary");
-    wasabi->setMaxSimulations(50);
+    wasabi->setMaxSimulations(1000);
     currentEA = 1;
     guiUpdate = 0;
     updateRate = 50;
@@ -783,7 +783,7 @@ void WASABIQtWindow::on_pushButtonTrigger_clicked()
 /** We expect messages (i.e. strings with a maximum length of 100 characters) that conform the following BNF:
  * <message>  ::= <senderID> '&' <command>
  * <senderID> ::= (any non-empty string)
- * <command>  ::= <add> | <trigger> | <impulse> | <dominance>
+ * <command>  ::= <add> | <trigger> | <impulse> | <dominance> | <remove> | <removeAll>
  * <add>      ::= 'ADD' '&' <name> [ '&' <globalID> '&' <initfile> ]
  * <trigger>  ::= 'TRIGGER' '&' <targetID> '&' <affectiveStateName> [ '&' <lifetime> ]
  * <impulse>  ::= 'IMPULSE' '&' <targetID> '&' <impvalue>
@@ -796,6 +796,8 @@ void WASABIQtWindow::on_pushButtonTrigger_clicked()
  * <lifetime> ::= (any double d with 0 <= d <= 100 or d == -1)
  * <impvalue> ::= (any integer i with -100 <= i <= 100 and i != 0)
  * <domvalue> ::= (any integer i with -100 <= i <= 100)
+ * <remove>   ::= 'REMOVE' '&' '<targetID>
+ * <removeAll>::= 'REMOVEALL'
  * ------------------------------------------------------------------------------------------
  * ADD: Adds a new EmotionalAttendee (EA) to the simulation.
  *      For each EA an independent reference point (XYZ) is created
@@ -820,6 +822,8 @@ void WASABIQtWindow::on_pushButtonTrigger_clicked()
  * DOMINANCE: Is used to set the dominance value of the EA with ID <targetID> to any value
  *            between 100 (dominant) and -100 (submissive). As of June 2012 only the two extreme values make sense, though.
  *            Concerning the value of <targetID> the same applies as in case of IMPULSE explained above.
+ * REMOVE : Removes a attendee with the given id;
+ * REMOVEALL: Removes all attendees with the given owner.
  */
 bool WASABIQtWindow::parseMessage(QString message) {
     std::cout << "WASABIQtWindow::parseMessage: message = '" << message.toStdString() << "'" << std::endl;
@@ -847,7 +851,7 @@ bool WASABIQtWindow::parseMessage(QString message) {
         return false;
     }
     bool ok = false;
-    switch (returnIndex(command.toStdString(), "ADD TRIGGER IMPULSE DOMINANCE")) {
+    switch (returnIndex(command.toStdString(), "ADD TRIGGER IMPULSE DOMINANCE REMOVE REMOVEALL")) {
     //<String senderID>|ADD|<String name==targetID>|<String globalID (optional)>
     //e.g. 'Robovie|ADD|Robovie|Robovie23' or 'Robovie1|ADD|Dylan F. Glas|120345_1' or simply 'Robovie|ADD|Chris'
     case 1:
@@ -873,6 +877,7 @@ bool WASABIQtWindow::parseMessage(QString message) {
                 ea->EmoConPerson->dynFilename = dyn;
                 ea->EmoConPerson->padFilename = pad;
                 wasabi->initEA(ea);
+                ea->setOwner(senderID.toStdString());
             } else {
                 qDebug()
                         << "MyApp::loadInitFile(): ERROR no ea with ID "
@@ -967,6 +972,34 @@ bool WASABIQtWindow::parseMessage(QString message) {
             return false;
         }
         ea->setDValue(impulse);
+        return true;
+        break;
+    case 5: //REMOVE <String targetID>
+        std::cout << "WASABIQtWindow::parseMessage: '" << "Removing attendee with global id "
+                  << targetID.toStdString() << "'" << " and local id " << ea->getLocalID() << std::endl;
+
+        //TODO this is just a workaround because otherwise WASABI crashes
+        ea = wasabi->getEAfromID("undef1");
+        currentEA = ea->getLocalID();
+
+        if(!wasabi->removeAttendee(targetID.toStdString())){
+            std::cerr << "WASABIQtWindow::parseMessage: Could not remove attendee with id '" << eaID
+                      << "'!" << std::endl;
+            return false;
+        }
+
+        return true;
+        break;
+    case 6: //REMOVEALL
+        std::cout << "WASABIQtWindow::parseMessage: '" << "Removing all attendees of " << senderID.toStdString() << std::endl;
+
+        //TODO this is just a workaround because otherwise WASABI crashes
+        ea = wasabi->getEAfromID("undef1");
+        currentEA = ea->getLocalID();
+
+        wasabi->removeAllAttendeesOf(senderID.toStdString());
+        //std::cout << "WASABIQtWindow::parseMessage: Removed " << attendeesRemoved << " attendees." << std::endl;
+
         return true;
         break;
     default:
