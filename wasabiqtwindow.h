@@ -147,6 +147,9 @@ private:
     // type: true = receive, false = transmit
     void printNetworkMessage(QString m, bool type, bool success = false, bool parsed = false);
     bool parseMessage(QString data);
+    std::string buildPadStrings(std::vector<cogaEmotionalAttendee*> attendees);
+    void sendAffectedLikelihood(std::string padStrings);
+    void sendEmoMlPadTrace();
     QString *networkOutputFormat;
     bool initEAbyXML(cogaEmotionalAttendee* ea);
     bool readEmotionML(QXmlStreamReader& xml, cogaEmotionalAttendee *ea);

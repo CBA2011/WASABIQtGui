@@ -1028,26 +1028,59 @@ void WASABIQtWindow::processPendingDatagrams()
 }
 
 void WASABIQtWindow::broadcastDatagram() {
-    char buffer[33];
-    itoa(wasabi->emoAttendees.size(),buffer,10);
-    std::string padString;
-    std::string padStrings [((int)(wasabi->emoAttendees.size()/100))+1];
-    cout << "PadString size: " << sizeof(padStrings) << endl;
-    for(int i=0; i<sizeof(padStrings); i++){
-        padStrings[i] = "total=";
-        padStrings[i] += buffer;
-        padStrings[i] += " ";
+
+    if (ui->checkBox_senderMode_AL->isChecked()) {
+
+        int i=0;
+        while(i<=wasabi->emoAttendees.size()/50){
+
+            int firstIndex = i*50;
+            int lastIndex = firstIndex + 50;
+            if(lastIndex > wasabi->emoAttendees.size()){
+                lastIndex = wasabi->emoAttendees.size();
+            }
+
+            vector<cogaEmotionalAttendee*> subset(&(wasabi->emoAttendees[firstIndex]), &(wasabi->emoAttendees[lastIndex]));
+
+            string padStrings = buildPadStrings(subset);
+
+            sendAffectedLikelihood(padStrings);
+
+            i++;
+        }
     }
+/*******
+    //QByteArray datagram = "SenderID&IMPULSE&1&" + QByteArray::number(messageNo);
+    std::stringstream ostr;
+    wasabi->getEAfromID(currentEA)->EmoConPerson->writeTransferable(ostr);
+    QByteArray datagram = QByteArray(ostr.str().data(), ostr.str().size());
+    if (udpSocketSender->writeDatagram(datagram.data(), datagram.size(), QHostAddress::Broadcast, sPort) != -1) {
+        printNetworkMessage(datagram.data(), false, true);
+    }
+    else {
+        printNetworkMessage(datagram.data(), false, false);
+    }
+********/
+    //EXTENSION1:
+
+    if (ui->checkBox_senderMode_PADtrace->isChecked()) {
+        sendEmoMlPadTrace();
+    }
+    //END OF EXTENSION1
+}
+
+std::string WASABIQtWindow::buildPadStrings(vector<cogaEmotionalAttendee*> attendees){
+    char buffer[33];
+    itoa(attendees.size(),buffer,10);
+    std::string padString;
+    std::string padStrings = "total=";
+    padStrings += buffer;
+    padStrings += " ";
     std::vector<cogaEmotionalAttendee*>::iterator iter_ea;
     //const char* pEmoMlStr;
-    int emoCounter = 0;
-    cout << "sending udp message" << endl;
-    for (iter_ea = wasabi->emoAttendees.begin(); iter_ea != wasabi->emoAttendees.end(); ++iter_ea){
-        cout << "Trying to calculate current index" << endl;
-        int currentindex = (int)(emoCounter/100);
-        cout << "currentIndex: " << currentindex << endl;
-        if (iter_ea != wasabi->emoAttendees.end() && iter_ea != wasabi->emoAttendees.begin()) {
-            padStrings[currentindex] += " ";
+    for (iter_ea = attendees.begin(); iter_ea != attendees.end(); ++iter_ea){
+        if (iter_ea != attendees.end() && iter_ea != attendees.begin()) {
+            padStrings += " ";
         }
         cogaEmotionalAttendee* ea = (*iter_ea);
         if (wasabi->getPADString(padString, ea->getLocalID())) {
@@ -1055,64 +1088,48 @@ void WASABIQtWindow::broadcastDatagram() {
         } else {
             std::cerr << "WASABIQtWindow::printNetworkMessage: No padString found!" << std::endl;
         }
-
         ui->textEditOut->append(QString("(%0) %1: %2").arg(QTime::currentTime().toString())
                             .arg(ea->getName().c_str())
                             .arg(padString.c_str()));
         //padStrings += std::to_string(ea->getLocalID());
         itoa(ea->getLocalID(), buffer, 10);
-        padStrings[currentindex] += "ID";
-        padStrings[currentindex] += buffer;
-        padStrings[currentindex] += "=" + ea->getGlobalID() + " ( " + padString + " )";
-        emoCounter++;
-        cout << "EmoCounter: " << emoCounter << endl;
+        padStrings += "ID";
+        padStrings += buffer;
+        padStrings += "=" + ea->getGlobalID() + " ( " + padString + " )";
     }
-    cout << "pad strings built" << endl;
-    for(int i=0; i<sizeof(padStrings); i++){
-        if (ui->checkBox_senderMode_AL->isChecked()) {
-            QByteArray datagram(padStrings[i].c_str());
-            if (udpSocketSender->writeDatagram(datagram.data(), datagram.size(), QHostAddress::Broadcast, sPort) != -1) {
-                printNetworkMessage(datagram.data(), false, true);
-            }
-            else {
-                printNetworkMessage(datagram.data(), false, false);
-            }
-        }
-    /*******
-        //QByteArray datagram = "SenderID&IMPULSE&1&" + QByteArray::number(messageNo);
-        std::stringstream ostr;
-        wasabi->getEAfromID(currentEA)->EmoConPerson->writeTransferable(ostr);
-        QByteArray datagram = QByteArray(ostr.str().data(), ostr.str().size());
-        if (udpSocketSender->writeDatagram(datagram.data(), datagram.size(), QHostAddress::Broadcast, sPort) != -1) {
-            printNetworkMessage(datagram.data(), false, true);
+
+    return padStrings;
+}
+
+void WASABIQtWindow::sendAffectedLikelihood(string padStrings){
+    QByteArray datagram(padStrings.c_str());
+
+    if (udpSocketSender->writeDatagram(datagram.data(), datagram.size(), QHostAddress::Broadcast, sPort) != -1) {
+        printNetworkMessage(datagram.data(), false, true);
+    }
+    else {
+        printNetworkMessage(datagram.data(), false, false);
+    }
+}
+
+void WASABIQtWindow::sendEmoMlPadTrace(){
+    std::vector<cogaEmotionalAttendee*>::iterator iter_ea;
+    //const char* pEmoMlStr;
+    for (iter_ea = wasabi->emoAttendees.begin(); iter_ea != wasabi->emoAttendees.end(); ++iter_ea){
+        cogaEmotionalAttendee* ea = (*iter_ea);
+
+        EmoMLString = composeEmoML(ea);
+        //pEmoMlStr = EmoMLString.c_str();
+        QByteArray emoMlDatagram(EmoMLString.c_str());
+        //udpSocketSender->writeDatagram(emoMlDatagram.data(), emoMlDatagram.size(), QHostAddress::Broadcast, sPort);
+        if (udpSocketSender->writeDatagram(emoMlDatagram.data(), emoMlDatagram.size(), QHostAddress::Broadcast, sPort) != -1) {
+            printNetworkMessage(emoMlDatagram.data(), false, true);
+            ea->resetBuffer();
         }
         else {
-            printNetworkMessage(datagram.data(), false, false);
-        }
-    ********/
-        //EXTENSION1:
-
-        if (ui->checkBox_senderMode_PADtrace->isChecked()) {
-            std::vector<cogaEmotionalAttendee*>::iterator iter_ea;
-            //const char* pEmoMlStr;
-            for (iter_ea = wasabi->emoAttendees.begin(); iter_ea != wasabi->emoAttendees.end(); ++iter_ea){
-                cogaEmotionalAttendee* ea = (*iter_ea);
-
-                EmoMLString = composeEmoML(ea);
-                //pEmoMlStr = EmoMLString.c_str();
-                QByteArray emoMlDatagram(EmoMLString.c_str());
-                //udpSocketSender->writeDatagram(emoMlDatagram.data(), emoMlDatagram.size(), QHostAddress::Broadcast, sPort);
-                if (udpSocketSender->writeDatagram(emoMlDatagram.data(), emoMlDatagram.size(), QHostAddress::Broadcast, sPort) != -1) {
-                    printNetworkMessage(emoMlDatagram.data(), false, true);
-                    ea->resetBuffer();
-                }
-                else {
-                    printNetworkMessage(emoMlDatagram.data(), false, false);
-                }
-            }
+            printNetworkMessage(emoMlDatagram.data(), false, false);
         }
     }
-    //END OF EXTENSION1
 }
 
 void WASABIQtWindow::printNetworkMessage(QString message, bool receive, bool success, bool parsed) {
