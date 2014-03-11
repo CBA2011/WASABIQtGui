@@ -943,7 +943,15 @@ bool WASABIQtWindow::parseMessage(QString message) {
                     << std::endl;
             return false;
         }
-        eaID = targetID.toInt(&ok);//atoi((const char*)targetID.mb_str());
+
+
+
+        //eaID = targetID.toInt(&ok);//atoi((const char*)targetID.mb_str());
+        ea = wasabi->getEAfromID(targetID.toStdString());
+        eaID = ea->getLocalID();
+
+
+
         std::cout << "WASABIQtWindow::parseMessage: eaID = " << eaID << std::endl;
         return wasabi->emotionalImpulse(impulse, eaID);
         break;
