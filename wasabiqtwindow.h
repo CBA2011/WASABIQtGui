@@ -138,6 +138,7 @@ private:
     int guiUpdate;
     int updateRate;
     int updateRateSender;
+    long lastPackageTimeStamp;
     int addEmotionalAttendee(const QString& name, const QString& globalID);
     AffectiveState* highlighted_as;
     QUdpSocket *udpSocketReceiver;
@@ -147,7 +148,7 @@ private:
     // type: true = receive, false = transmit
     void printNetworkMessage(QString m, bool type, bool success = false, bool parsed = false);
     bool parseMessage(QString data);
-    std::string buildPadStrings(std::vector<cogaEmotionalAttendee*> attendees);
+    std::string buildPadStrings(std::vector<cogaEmotionalAttendee*> attendees, std::string timeStamp);
     void sendAffectedLikelihood(std::string padStrings);
     void sendEmoMlPadTrace();
     QString *networkOutputFormat;
@@ -155,6 +156,7 @@ private:
     bool readEmotionML(QXmlStreamReader& xml, cogaEmotionalAttendee *ea);
     bool readInfo(QXmlStreamReader& xml, cogaEmotionalAttendee *ea);
     bool readEmotion(QXmlStreamReader& xml, cogaEmotionalAttendee *ea);
+    std::string getPackageTimeStamp();
 };
 
 #endif // WASABIQTWINDOW_H

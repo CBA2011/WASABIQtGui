@@ -30,6 +30,7 @@
 #include "SecondaryEmotion.h"
 #include <sstream>
 #include <fstream>
+#include <ctime>
 #include <string>
 #include <QDebug>
 #include <QDir>
@@ -105,6 +106,7 @@ WASABIQtWindow::WASABIQtWindow(QWidget *parent) :
     guiUpdate = 0;
     updateRate = 50;
     updateRateSender = 1;
+    lastPackageTimeStamp = 0;
     serverAutoStart = false;
     startMinimized = false;
     networkOutputFormat = new QString("default");
@@ -971,7 +973,14 @@ bool WASABIQtWindow::parseMessage(QString message) {
                     << std::endl;
             return false;
         }
-        eaID = targetID.toInt(&ok);//atoi((const char*)targetID.mb_str());
+
+
+
+        //eaID = targetID.toInt(&ok);//atoi((const char*)targetID.mb_str());
+        ea = wasabi->getEAfromID(targetID.toStdString());
+        eaID = ea->getLocalID();
+
+
         std::cout << "WASABIQtWindow::parseMessage: eaID = " << eaID << std::endl;
         ea = wasabi->getEAfromID(eaID);
         if (!ea) {
@@ -1039,6 +1048,8 @@ void WASABIQtWindow::broadcastDatagram() {
 
     if (ui->checkBox_senderMode_AL->isChecked()) {
 
+        string timeStamp = getPackageTimeStamp();
+
         int i=0;
         while(i<=wasabi->emoAttendees.size()/50){
 
@@ -1050,7 +1061,7 @@ void WASABIQtWindow::broadcastDatagram() {
 
             vector<cogaEmotionalAttendee*> subset(&(wasabi->emoAttendees[firstIndex]), &(wasabi->emoAttendees[lastIndex]));
 
-            string padStrings = buildPadStrings(subset);
+            string padStrings = buildPadStrings(subset, timeStamp);
 
             sendAffectedLikelihood(padStrings);
 
@@ -1077,11 +1088,28 @@ void WASABIQtWindow::broadcastDatagram() {
     //END OF EXTENSION1
 }
 
-std::string WASABIQtWindow::buildPadStrings(vector<cogaEmotionalAttendee*> attendees){
+string WASABIQtWindow::getPackageTimeStamp(){
+
+    stringstream time;
+    clock_t t = clock();
+    if(t <= lastPackageTimeStamp){
+        t = lastPackageTimeStamp+1;
+    }
+    lastPackageTimeStamp = t;
+    time << t;
+    return time.str();
+
+}
+
+std::string WASABIQtWindow::buildPadStrings(vector<cogaEmotionalAttendee*> attendees, string timeStamp){
     char buffer[33];
     itoa(attendees.size(),buffer,10);
     std::string padString;
-    std::string padStrings = "total=";
+
+    std::string padStrings = "timeStamp=";
+    padStrings += timeStamp;
+    padStrings += " ";
+    padStrings += "total=";
     padStrings += buffer;
     padStrings += " ";
     std::vector<cogaEmotionalAttendee*>::iterator iter_ea;
