@@ -791,7 +791,9 @@ void WASABIQtWindow::on_pushButtonTrigger_clicked()
  * <impulse>  ::= 'IMPULSE' '&' <targetID> '&' <impvalue>
  * <dominance>::= 'DOMINANCE' '&' <targetID> '&' <domvalue>
  * <name>     ::= (any non-empty string)
- * <initfile> ::= (any non-empty string, defaults to 'init', if not found)
+ * <initfile> ::= <padFile> | <xmlFile>
+ * <padValue  ::= (any non-empty string, defaults to 'init', if not found)
+ * <xmlValue> ::= (any non-empty string) '.xml'
  * <globalID> ::= (any non-empty string)
  * <targetID> ::= (any non-empty string)
  * <affectiveStateName> ::= (any non-empty string, must match a name of an emotion, though)
@@ -825,7 +827,7 @@ void WASABIQtWindow::on_pushButtonTrigger_clicked()
  *            between 100 (dominant) and -100 (submissive). As of June 2012 only the two extreme values make sense, though.
  *            Concerning the value of <targetID> the same applies as in case of IMPULSE explained above.
  * REMOVE : Removes a attendee with the given id;
- * REMOVEALL: Removes all attendees with the given owner.
+ * REMOVEALL: Removes all attendees of the given owner.
  */
 bool WASABIQtWindow::parseMessage(QString message) {
     std::cout << "WASABIQtWindow::parseMessage: message = '" << message.toStdString() << "'" << std::endl;
@@ -869,23 +871,38 @@ bool WASABIQtWindow::parseMessage(QString message) {
             param2 = str_list.at(4); // <String globalID>
             newLocalID = addEmotionalAttendee(targetID, param1); // param1 is the globalID here, e.g. '120345_1'
 
-            QString param3 = param2.append(".emo_dyn");
-            param2 = param2.append(".emo_pad");
+            if(param2.endsWith(".xml")){
+                if(ea = wasabi->getEAfromID(newLocalID)){
+                    ea->EmoConPerson->xmlFilename = param2.toStdString();
+                    initEAbyXML(ea);
+                    ea->setOwner(senderID.toStdString());
+                } else {
+                    qDebug()
+                            << "MyApp::loadInitFile(): ERROR no ea with ID "
+                            << newLocalID
+                            << " found!"
+                               ;
+                }
+            }
+            else{
+                QString param3 = param2.append(".emo_dyn");
+                param2 = param2.append(".emo_pad");
 
-            std::string dyn = param3.toStdString();
-            std::string pad = param2.toStdString();
+                std::string dyn = param3.toStdString();
+                std::string pad = param2.toStdString();
 
-            if (ea = wasabi->getEAfromID(newLocalID)) {
-                ea->EmoConPerson->dynFilename = dyn;
-                ea->EmoConPerson->padFilename = pad;
-                wasabi->initEA(ea);
-                ea->setOwner(senderID.toStdString());
-            } else {
-                qDebug()
-                        << "MyApp::loadInitFile(): ERROR no ea with ID "
-                        << newLocalID
-                        << " found!"
-                           ;
+                if (ea = wasabi->getEAfromID(newLocalID)) {
+                    ea->EmoConPerson->dynFilename = dyn;
+                    ea->EmoConPerson->padFilename = pad;
+                    wasabi->initEA(ea);
+                    ea->setOwner(senderID.toStdString());
+                } else {
+                    qDebug()
+                            << "MyApp::loadInitFile(): ERROR no ea with ID "
+                            << newLocalID
+                            << " found!"
+                               ;
+                }
             }
         }
         if (newLocalID == 0) {
