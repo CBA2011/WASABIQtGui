@@ -1078,7 +1078,7 @@ void WASABIQtWindow::broadcastDatagram() {
 
             vector<cogaEmotionalAttendee*> subset(&(wasabi->emoAttendees[firstIndex]), &(wasabi->emoAttendees[lastIndex]));
 
-            string padStrings = buildPadStrings(subset, timeStamp);
+            string padStrings = buildAffectedLikelihoodStrings(subset, timeStamp);
 
             sendAffectedLikelihood(padStrings);
 
@@ -1086,15 +1086,17 @@ void WASABIQtWindow::broadcastDatagram() {
         }
     }
 /*******
-    //QByteArray datagram = "SenderID&IMPULSE&1&" + QByteArray::number(messageNo);
-    std::stringstream ostr;
-    wasabi->getEAfromID(currentEA)->EmoConPerson->writeTransferable(ostr);
-    QByteArray datagram = QByteArray(ostr.str().data(), ostr.str().size());
-    if (udpSocketSender->writeDatagram(datagram.data(), datagram.size(), QHostAddress::Broadcast, sPort) != -1) {
-        printNetworkMessage(datagram.data(), false, true);
-    }
-    else {
-        printNetworkMessage(datagram.data(), false, false);
+    if(ui->checkBox_senderMode_PAD){
+        //QByteArray datagram = "SenderID&IMPULSE&1&" + QByteArray::number(messageNo);
+        std::stringstream ostr;
+        wasabi->getEAfromID(currentEA)->EmoConPerson->writeTransferable(ostr);
+        QByteArray datagram = QByteArray(ostr.str().data(), ostr.str().size());
+        if (udpSocketSender->writeDatagram(datagram.data(), datagram.size(), QHostAddress::Broadcast, sPort) != -1) {
+            printNetworkMessage(datagram.data(), false, true);
+        }
+        else {
+            printNetworkMessage(datagram.data(), false, false);
+        }
     }
 ********/
     //EXTENSION1:
@@ -1118,7 +1120,7 @@ string WASABIQtWindow::getPackageTimeStamp(){
 
 }
 
-std::string WASABIQtWindow::buildPadStrings(vector<cogaEmotionalAttendee*> attendees, string timeStamp){
+std::string WASABIQtWindow::buildAffectedLikelihoodStrings(vector<cogaEmotionalAttendee*> attendees, string timeStamp){
     char buffer[33];
     itoa(attendees.size(),buffer,10);
     std::string padString;
@@ -1148,7 +1150,11 @@ std::string WASABIQtWindow::buildPadStrings(vector<cogaEmotionalAttendee*> atten
         itoa(ea->getLocalID(), buffer, 10);
         padStrings += "ID";
         padStrings += buffer;
-        padStrings += "=" + ea->getGlobalID() + " ( " + padString + " )";
+
+        stringstream padValues;
+        padValues << " P=" << ea->getPValue() << " A=" << ea->getAValue() << " D=" << ea->getDValue();
+
+        padStrings += "=" + ea->getGlobalID() + " ( " + padString + padValues.str() + " )";
     }
 
     return padStrings;
