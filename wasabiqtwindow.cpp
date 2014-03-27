@@ -562,8 +562,8 @@ int WASABIQtWindow::addEmotionalAttendee(const QString& name, const QString& glo
 
         return newLocalID;
     }
-    std::cout << "myGuiFrame::addEmotionalAttendee: ERROR could not create new EA!" << std::endl;
-    return 0;
+    std::cout << "myGuiFrame::addEmotionalAttendee: ERROR could not create new EA or it could not be initialized!" << std::endl;
+    return newLocalID;
 }
 
 void WASABIQtWindow::on_spinBoxForceX_valueChanged(int arg1)
@@ -967,6 +967,8 @@ bool WASABIQtWindow::parseMessage(QString message) {
 
         //eaID = targetID.toInt(&ok);//atoi((const char*)targetID.mb_str());
         ea = wasabi->getEAfromID(targetID.toStdString());
+        if(ea == 0)
+            break;
         eaID = ea->getLocalID();
 
 
@@ -995,6 +997,8 @@ bool WASABIQtWindow::parseMessage(QString message) {
 
         //eaID = targetID.toInt(&ok);//atoi((const char*)targetID.mb_str());
         ea = wasabi->getEAfromID(targetID.toStdString());
+        if(ea == 0)
+            break;
         eaID = ea->getLocalID();
 
 
