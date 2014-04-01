@@ -7,7 +7,7 @@
 #include($$_PRO_FILE_PWD_/WASABI-qwt-clone/qwt-code/qwt/qwtconfig.pri)
 #QMAKEFEATURES += $$_PRO_FILE_PWD_/WASABI-qwt-clone/qwt-code/qwt
 #QMAKEFEATURES += $$_PRO_FILE_PWD_/WASABIEngine
-QT       += core gui opengl network
+QT       += core gui opengl network xml
 CONFIG += qwt
 
 TARGET = WASABIGuiQt

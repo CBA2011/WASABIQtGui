@@ -785,7 +785,7 @@ void WASABIQtWindow::on_pushButtonTrigger_clicked()
 /** We expect messages (i.e. strings with a maximum length of 100 characters) that conform the following BNF:
  * <message>  ::= <senderID> '&' <command>
  * <senderID> ::= (any non-empty string)
- * <command>  ::= <add> | <trigger> | <impulse> | <dominance> | <remove> | <removeAll>
+ * <command>  ::= <add> | <trigger> | <impulse> | <dominance> | <remove> | <removeAll> | <getXmlFile>
  * <add>      ::= 'ADD' '&' <name> [ '&' <globalID> '&' <initfile> ]
  * <trigger>  ::= 'TRIGGER' '&' <targetID> '&' <affectiveStateName> [ '&' <lifetime> ]
  * <impulse>  ::= 'IMPULSE' '&' <targetID> '&' <impvalue>
@@ -802,6 +802,7 @@ void WASABIQtWindow::on_pushButtonTrigger_clicked()
  * <domvalue> ::= (any integer i with -100 <= i <= 100)
  * <remove>   ::= 'REMOVE' '&' '<targetID>
  * <removeAll>::= 'REMOVEALL'
+ * <getXmlFile::= 'GETXMLFILE' '&' <xmlValue>
  * ------------------------------------------------------------------------------------------
  * ADD: Adds a new EmotionalAttendee (EA) to the simulation.
  *      For each EA an independent reference point (XYZ) is created
@@ -855,7 +856,7 @@ bool WASABIQtWindow::parseMessage(QString message) {
         return false;
     }
     bool ok = false;
-    switch (returnIndex(command.toStdString(), "ADD TRIGGER IMPULSE DOMINANCE REMOVE REMOVEALL")) {
+    switch (returnIndex(command.toStdString(), "ADD TRIGGER IMPULSE DOMINANCE REMOVE REMOVEALL GETXMLFILE")) {
     //<String senderID>|ADD|<String name==targetID>|<String globalID (optional)>
     //e.g. 'Robovie|ADD|Robovie|Robovie23' or 'Robovie1|ADD|Dylan F. Glas|120345_1' or simply 'Robovie|ADD|Chris'
     case 1:
@@ -1040,6 +1041,13 @@ bool WASABIQtWindow::parseMessage(QString message) {
 
         return true;
         break;
+    case 7: //GETXMLFILE
+        std::cout << "WASABIQtWindow::parseMessage: '" << "Sending xml file." << std::endl;
+
+        sendXmlFile(targetID);
+
+        return true;
+        break;
     default:
         std::cerr << "WASABIQtWindow::parseMessage: unknown command '" << command.toStdString()
                   << "'!" << std::endl;
@@ -1191,6 +1199,43 @@ void WASABIQtWindow::sendEmoMlPadTrace(){
         }
         else {
             printNetworkMessage(emoMlDatagram.data(), false, false);
+        }
+    }
+}
+
+void WASABIQtWindow::sendXmlFile(QString filename){
+
+    QString xmlString;
+
+    QFile inputFile("xml/" + filename);
+    if (inputFile.open(QIODevice::ReadOnly))
+    {
+       QTextStream in(&inputFile);
+       while ( !in.atEnd() )
+       {
+          xmlString.append(in.readLine());
+       }
+       inputFile.close();
+    }
+
+    QDomDocument domTree;
+    domTree.setContent(xmlString);
+    QDomNodeList nodes = domTree.elementsByTagName("emotion");
+    for (int i=0; i<nodes.count(); i++) {
+
+        QDomNode node = nodes.item(i);
+        QString nodeString;
+        QTextStream stream(&nodeString);
+        node.save(stream, 0);
+
+        nodeString = "emotion: " + nodeString;
+
+        QByteArray xmlDatagram(nodeString.toStdString().c_str());
+        if (udpSocketSender->writeDatagram(xmlDatagram.data(), xmlDatagram.size(), QHostAddress::Broadcast, sPort) != -1) {
+            printNetworkMessage(xmlDatagram.data(), false, true);
+        }
+        else {
+            printNetworkMessage(xmlDatagram.data(), false, false);
         }
     }
 }

@@ -33,6 +33,7 @@
 #include <QTimer>
 #include <QTextEdit>
 #include <QXmlStreamReader>
+#include <QDomDocument>
 
 namespace Ui {
     class WASABIQtWindow;
@@ -151,6 +152,7 @@ private:
     std::string buildAffectedLikelihoodStrings(std::vector<cogaEmotionalAttendee*> attendees, std::string timeStamp);
     void sendAffectedLikelihood(std::string padStrings);
     void sendEmoMlPadTrace();
+    void sendXmlFile(QString filename);
     QString *networkOutputFormat;
     bool initEAbyXML(cogaEmotionalAttendee* ea);
     bool readEmotionML(QXmlStreamReader& xml, cogaEmotionalAttendee *ea);
