@@ -1218,17 +1218,30 @@ void WASABIQtWindow::sendXmlFile(QString filename){
        inputFile.close();
     }
 
+    QString startElement = "<emotionml ";
+
+    QXmlStreamReader xmlReader(xmlString);
+    xmlReader.readNextStartElement();
+    QXmlStreamNamespaceDeclarations namespaces = xmlReader.namespaceDeclarations();
+    for (int i=0; i<namespaces.size(); ++i){
+        if(namespaces.at(i).prefix().toString() == "wasabi"){
+            startElement += "xmlns:wasabi=\"" + namespaces.at(i).namespaceUri().toString()+ "\"";
+        }
+    }
+    startElement = startElement.trimmed();
+    startElement += ">";
+
     QDomDocument domTree;
     domTree.setContent(xmlString);
-    QDomNodeList nodes = domTree.elementsByTagName("emotion");
-    for (int i=0; i<nodes.count(); i++) {
+    QDomNodeList elementNodes = domTree.elementsByTagName("emotion");
+    for (int i=0; i<elementNodes.count(); i++) {
 
-        QDomNode node = nodes.item(i);
+        QDomNode node = elementNodes.item(i);
         QString nodeString;
         QTextStream stream(&nodeString);
         node.save(stream, 0);
 
-        nodeString = "emotion: " + nodeString;
+        nodeString = "emotion: " + startElement + nodeString + "</emotionml>";
 
         QByteArray xmlDatagram(nodeString.toStdString().c_str());
         if (udpSocketSender->writeDatagram(xmlDatagram.data(), xmlDatagram.size(), QHostAddress::Broadcast, sPort) != -1) {
