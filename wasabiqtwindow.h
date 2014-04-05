@@ -34,6 +34,8 @@
 #include <QTextEdit>
 #include <QXmlStreamReader>
 #include <QDomDocument>
+#include <ctime>
+#include <unistd.h>
 
 namespace Ui {
     class WASABIQtWindow;
@@ -141,6 +143,7 @@ private:
     int updateRateSender;
     long lastPackageTimeStamp;
     int addEmotionalAttendee(const QString& name, const QString& globalID);
+    void updateGuiAfterAddingAgent(cogaEmotionalAttendee* ea);
     AffectiveState* highlighted_as;
     QUdpSocket *udpSocketReceiver;
     QUdpSocket *udpSocketSender;

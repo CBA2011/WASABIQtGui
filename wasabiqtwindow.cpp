@@ -30,7 +30,6 @@
 #include "SecondaryEmotion.h"
 #include <sstream>
 #include <fstream>
-#include <ctime>
 #include <string>
 #include <QDebug>
 #include <QDir>
@@ -548,10 +547,12 @@ int WASABIQtWindow::addEmotionalAttendee(const QString& name, const QString& glo
         std::cout << "myGuiFrame::addEmotionalAttendee: ERROR globalID " << globalID.toStdString() << " already in use!" << std::endl;
         return 0; // means ERROR here
     }
-    int newLocalID = wasabi->addEmotionalAttendee(name.toStdString(), globalID.toStdString());
+
+    return wasabi->addEmotionalAttendee(name.toStdString(), globalID.toStdString());
+
+    /*int newLocalID = wasabi->addEmotionalAttendee(name.toStdString(), globalID.toStdString());
     if (newLocalID != 0 && wasabi->initEA(wasabi->getEAfromID(newLocalID))){
         comboBoxAttendee_update();
-
 
         currentEA = newLocalID;
         cogaEmotionalAttendee* ea = wasabi->getEAfromID(currentEA);
@@ -563,7 +564,13 @@ int WASABIQtWindow::addEmotionalAttendee(const QString& name, const QString& glo
         return newLocalID;
     }
     std::cout << "myGuiFrame::addEmotionalAttendee: ERROR could not create new EA or it could not be initialized!" << std::endl;
-    return newLocalID;
+    return newLocalID;*/
+}
+
+void WASABIQtWindow::updateGuiAfterAddingAgent(cogaEmotionalAttendee* ea){
+    comboBoxAttendee_update();
+    initValues(ea);
+    ui->statusBar->showMessage(QString("Attendee %0 initialized").arg(ea->getName().c_str()), 1000);
 }
 
 void WASABIQtWindow::on_spinBoxForceX_valueChanged(int arg1)
@@ -859,7 +866,7 @@ bool WASABIQtWindow::parseMessage(QString message) {
     switch (returnIndex(command.toStdString(), "ADD TRIGGER IMPULSE DOMINANCE REMOVE REMOVEALL GETXMLFILE")) {
     //<String senderID>|ADD|<String name==targetID>|<String globalID (optional)>
     //e.g. 'Robovie|ADD|Robovie|Robovie23' or 'Robovie1|ADD|Dylan F. Glas|120345_1' or simply 'Robovie|ADD|Chris'
-    case 1:
+    case 1://ADD <name> [ <globalID> <initfile> ]
         if (str_list.size() == 3) {
             newLocalID = addEmotionalAttendee(targetID, "undef"); // targetID is the 'real name' here, e.g. 'Dylan F. Glas'
         }
@@ -871,9 +878,10 @@ bool WASABIQtWindow::parseMessage(QString message) {
             param1 = str_list.at(3); // <String globalID>
             param2 = str_list.at(4); // <String globalID>
             newLocalID = addEmotionalAttendee(targetID, param1); // param1 is the globalID here, e.g. '120345_1'
+            ea = wasabi->getEAfromID(newLocalID);
 
             if(param2.endsWith(".xml")){
-                if(ea = wasabi->getEAfromID(newLocalID)){
+                if(ea != NULL){
                     ea->EmoConPerson->xmlFilename = param2.toStdString();
                     initEAbyXML(ea);
                     ea->setOwner(senderID.toStdString());
@@ -892,7 +900,7 @@ bool WASABIQtWindow::parseMessage(QString message) {
                 std::string dyn = param3.toStdString();
                 std::string pad = param2.toStdString();
 
-                if (ea = wasabi->getEAfromID(newLocalID)) {
+                if (ea != NULL) {
                     ea->EmoConPerson->dynFilename = dyn;
                     ea->EmoConPerson->padFilename = pad;
                     wasabi->initEA(ea);
@@ -904,7 +912,9 @@ bool WASABIQtWindow::parseMessage(QString message) {
                             << " found!"
                                ;
                 }
+                updateGuiAfterAddingAgent(ea);
             }
+
         }
         if (newLocalID == 0) {
             return false;
@@ -1250,6 +1260,9 @@ void WASABIQtWindow::sendXmlFile(QString filename){
         else {
             printNetworkMessage(xmlDatagram.data(), false, false);
         }
+
+        //TODO Find a better solution. If there are sent too many packages at once, some get missed.
+        usleep(1000);
     }
 }
 
