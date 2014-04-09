@@ -604,7 +604,12 @@ void WASABIQtWindow::on_pushButtonAdd_clicked()
     if (!ok || globalID.isEmpty()) {
         return;
     }
-    addEmotionalAttendee(name, globalID);
+
+    int localId = addEmotionalAttendee(name, globalID);
+    cogaEmotionalAttendee* ea = wasabi->getEAfromID(localId);
+    if(!wasabi->initEA(ea)){
+        initEAbyXML(ea);
+    }
 }
 
 void WASABIQtWindow::on_comboBoxEmoAttendee_currentIndexChanged(const QString &arg1)
@@ -947,12 +952,20 @@ bool WASABIQtWindow::parseMessage(QString message) {
         }
 
         //TODO CHECK THE ABOVE!!!
-        eaID = targetID.toInt(&ok);//atoi((const char*)targetID.mb_str());
-        std::cout << "WASABIQtWindow::parseMessage: eaID = " << eaID << std::endl;
+        //TODO controll: Wurde hier in der Vergangenheit die localId per Netzwerk gesendet?
+        //Die ist doch eigentlich von außen gar nicht sichtbar!?
+        //eaID = targetID.toInt(&ok);//atoi((const char*)targetID.mb_str());
+        ea = wasabi->getEAfromID(targetID.toStdString());
+        if(!ea)
+            return false;
+        eaID = ea->getLocalID();
+
+        /*std::cout << "WASABIQtWindow::parseMessage: eaID = " << eaID << std::endl;
         if (ok && eaID > 0) {
             ea = wasabi->getEAfromID(eaID);
         }
-        if (!ea || !ea->EmoConPerson->triggerAS(param1.toStdString(), lifetime)) {
+        if (!ea || !ea->EmoConPerson->triggerAS(param1.toStdString(), lifetime)) {*/
+        if (!ea->EmoConPerson->triggerAS(param1.toStdString(), lifetime)) {
             std::cout << "WASABIQtWindow::parseMessage: Couldn't TRIGGER '" << param1.toStdString() << "'!" << std::endl;
             return false;
         }
@@ -974,15 +987,13 @@ bool WASABIQtWindow::parseMessage(QString message) {
             return false;
         }
 
-
-
+        //TODO controll: Wurde hier in der Vergangenheit die localId per Netzwerk gesendet?
+        //Die ist doch eigentlich von außen gar nicht sichtbar!?
         //eaID = targetID.toInt(&ok);//atoi((const char*)targetID.mb_str());
         ea = wasabi->getEAfromID(targetID.toStdString());
-        if(ea == 0)
-            break;
+        if(!ea)
+            return false;
         eaID = ea->getLocalID();
-
-
 
         std::cout << "WASABIQtWindow::parseMessage: eaID = " << eaID << std::endl;
         return wasabi->emotionalImpulse(impulse, eaID);
@@ -1004,22 +1015,21 @@ bool WASABIQtWindow::parseMessage(QString message) {
             return false;
         }
 
-
-
+        //TODO controll: Wurde hier in der Vergangenheit die localId per Netzwerk gesendet?
+        //Die ist doch eigentlich von außen gar nicht sichtbar!?
         //eaID = targetID.toInt(&ok);//atoi((const char*)targetID.mb_str());
         ea = wasabi->getEAfromID(targetID.toStdString());
-        if(ea == 0)
-            break;
+        if(!ea)
+            return false;
         eaID = ea->getLocalID();
 
-
-        std::cout << "WASABIQtWindow::parseMessage: eaID = " << eaID << std::endl;
+        /*std::cout << "WASABIQtWindow::parseMessage: eaID = " << eaID << std::endl;
         ea = wasabi->getEAfromID(eaID);
         if (!ea) {
             std::cerr << "WASABIQtWindow::parseMessage: unknown ea with ID '" << eaID
                       << "'!" << std::endl;
             return false;
-        }
+        }*/
         ea->setDValue(impulse);
         return true;
         break;
@@ -1051,7 +1061,7 @@ bool WASABIQtWindow::parseMessage(QString message) {
 
         return true;
         break;
-    case 7: //GETXMLFILE
+    case 7: //GETXMLFILE <xmlValue>
         std::cout << "WASABIQtWindow::parseMessage: '" << "Sending xml file." << std::endl;
 
         sendXmlFile(targetID);
@@ -1147,7 +1157,7 @@ std::string WASABIQtWindow::buildAffectedLikelihoodStrings(vector<cogaEmotionalA
     itoa(attendees.size(),buffer,10);
     std::string padString;
 
-    std::string padStrings = "timeStamp=";
+    std::string padStrings = "agents: timeStamp=";
     padStrings += timeStamp;
     padStrings += " ";
     padStrings += "total=";
