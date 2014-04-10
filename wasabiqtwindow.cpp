@@ -804,8 +804,8 @@ void WASABIQtWindow::on_pushButtonTrigger_clicked()
  * <dominance>::= 'DOMINANCE' '&' <targetID> '&' <domvalue>
  * <name>     ::= (any non-empty string)
  * <initfile> ::= <padFile> | <xmlFile>
- * <padValue  ::= (any non-empty string, defaults to 'init', if not found)
- * <xmlValue> ::= (any non-empty string) '.xml'
+ * <padFile>  ::= (any non-empty string, defaults to 'init', if not found)
+ * <xmlFile>  ::= (any non-empty string) '.xml'
  * <globalID> ::= (any non-empty string)
  * <targetID> ::= (any non-empty string)
  * <affectiveStateName> ::= (any non-empty string, must match a name of an emotion, though)
@@ -814,7 +814,7 @@ void WASABIQtWindow::on_pushButtonTrigger_clicked()
  * <domvalue> ::= (any integer i with -100 <= i <= 100)
  * <remove>   ::= 'REMOVE' '&' '<targetID>
  * <removeAll>::= 'REMOVEALL'
- * <getXmlFile::= 'GETXMLFILE' '&' <xmlValue>
+ * <getXmlFile>::= 'GETXMLFILE' '&' <xmlFile>
  * ------------------------------------------------------------------------------------------
  * ADD: Adds a new EmotionalAttendee (EA) to the simulation.
  *      For each EA an independent reference point (XYZ) is created
@@ -841,6 +841,8 @@ void WASABIQtWindow::on_pushButtonTrigger_clicked()
  *            Concerning the value of <targetID> the same applies as in case of IMPULSE explained above.
  * REMOVE : Removes a attendee with the given id;
  * REMOVEALL: Removes all attendees of the given owner.
+ * GETXMLFILE: Advises WASABI to send all specified emotions of the given file.
+ *             For each emotion a separte udp package is sent.
  */
 bool WASABIQtWindow::parseMessage(QString message) {
     std::cout << "WASABIQtWindow::parseMessage: message = '" << message.toStdString() << "'" << std::endl;
@@ -952,19 +954,10 @@ bool WASABIQtWindow::parseMessage(QString message) {
         }
 
         //TODO CHECK THE ABOVE!!!
-        //TODO controll: Wurde hier in der Vergangenheit die localId per Netzwerk gesendet?
-        //Die ist doch eigentlich von außen gar nicht sichtbar!?
-        //eaID = targetID.toInt(&ok);//atoi((const char*)targetID.mb_str());
         ea = wasabi->getEAfromID(targetID.toStdString());
         if(!ea)
             return false;
-        eaID = ea->getLocalID();
 
-        /*std::cout << "WASABIQtWindow::parseMessage: eaID = " << eaID << std::endl;
-        if (ok && eaID > 0) {
-            ea = wasabi->getEAfromID(eaID);
-        }
-        if (!ea || !ea->EmoConPerson->triggerAS(param1.toStdString(), lifetime)) {*/
         if (!ea->EmoConPerson->triggerAS(param1.toStdString(), lifetime)) {
             std::cout << "WASABIQtWindow::parseMessage: Couldn't TRIGGER '" << param1.toStdString() << "'!" << std::endl;
             return false;
@@ -987,9 +980,6 @@ bool WASABIQtWindow::parseMessage(QString message) {
             return false;
         }
 
-        //TODO controll: Wurde hier in der Vergangenheit die localId per Netzwerk gesendet?
-        //Die ist doch eigentlich von außen gar nicht sichtbar!?
-        //eaID = targetID.toInt(&ok);//atoi((const char*)targetID.mb_str());
         ea = wasabi->getEAfromID(targetID.toStdString());
         if(!ea)
             return false;
@@ -1015,21 +1005,10 @@ bool WASABIQtWindow::parseMessage(QString message) {
             return false;
         }
 
-        //TODO controll: Wurde hier in der Vergangenheit die localId per Netzwerk gesendet?
-        //Die ist doch eigentlich von außen gar nicht sichtbar!?
-        //eaID = targetID.toInt(&ok);//atoi((const char*)targetID.mb_str());
         ea = wasabi->getEAfromID(targetID.toStdString());
         if(!ea)
             return false;
-        eaID = ea->getLocalID();
 
-        /*std::cout << "WASABIQtWindow::parseMessage: eaID = " << eaID << std::endl;
-        ea = wasabi->getEAfromID(eaID);
-        if (!ea) {
-            std::cerr << "WASABIQtWindow::parseMessage: unknown ea with ID '" << eaID
-                      << "'!" << std::endl;
-            return false;
-        }*/
         ea->setDValue(impulse);
         return true;
         break;
@@ -1040,6 +1019,7 @@ bool WASABIQtWindow::parseMessage(QString message) {
         //TODO this is just a workaround because otherwise WASABI crashes
         ea = wasabi->getEAfromID("undef1");
         currentEA = ea->getLocalID();
+        eaID = ea->getLocalID();
 
         if(!wasabi->removeAttendee(targetID.toStdString())){
             std::cerr << "WASABIQtWindow::parseMessage: Could not remove attendee with id '" << eaID
