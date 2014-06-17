@@ -26,19 +26,31 @@ DOXYFILE_ENCODING      = UTF-8
 # identify the project. Note that if you do not use Doxywizard you need 
 # to put quotes around the project name if it contains spaces.
 
+<<<<<<< HEAD
 PROJECT_NAME           = WASABIQtGui
+=======
+PROJECT_NAME           = WASABIEngine
+>>>>>>> 2d72648f38f788c21786415b612ac6cfa1b4e474
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. 
 # This could be handy for archiving the generated documentation or 
 # if some version control system is used.
 
+<<<<<<< HEAD
 PROJECT_NUMBER         = 0.5
+=======
+PROJECT_NUMBER         = 1.0
+>>>>>>> 2d72648f38f788c21786415b612ac6cfa1b4e474
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description 
 # for a project that appears at the top of each page and should give viewer 
 # a quick idea about the purpose of the project. Keep the description short.
 
+<<<<<<< HEAD
 PROJECT_BRIEF          = "The GUI part of the WASABI Affect Simulation Architecture"
+=======
+PROJECT_BRIEF          = "The core library of WASABI Affect Simulation"
+>>>>>>> 2d72648f38f788c21786415b612ac6cfa1b4e474
 
 # With the PROJECT_LOGO tag one can specify an logo or icon that is 
 # included in the documentation. The maximum height of the logo should not 
@@ -52,7 +64,11 @@ PROJECT_LOGO           =
 # If a relative path is entered, it will be relative to the location 
 # where doxygen was started. If left blank the current directory will be used.
 
+<<<<<<< HEAD
 OUTPUT_DIRECTORY       = C:/Users/CBA/Git/WASABIGuiQt/doygen
+=======
+OUTPUT_DIRECTORY       = C:/Users/CBA/WASABIEngine/doxygen
+>>>>>>> 2d72648f38f788c21786415b612ac6cfa1b4e474
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create 
 # 4096 sub-directories (in 2 levels) under the output directory of each output 
@@ -638,7 +654,11 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
+<<<<<<< HEAD
 INPUT                  = C:/Users/CBA/Git/WASABIGuiQt
+=======
+INPUT                  = C:/Users/CBA/WASABIEngine
+>>>>>>> 2d72648f38f788c21786415b612ac6cfa1b4e474
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 
