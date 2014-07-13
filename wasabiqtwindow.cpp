@@ -1133,15 +1133,13 @@ string WASABIQtWindow::getPackageTimeStamp(){
 }
 
 std::string WASABIQtWindow::buildAffectedLikelihoodStrings(vector<cogaEmotionalAttendee*> attendees, string timeStamp){
-    char buffer[33];
-    itoa(attendees.size(),buffer,10);
     std::string padString;
 
     std::string padStrings = "agents: timeStamp=";
     padStrings += timeStamp;
     padStrings += " ";
     padStrings += "total=";
-    padStrings += buffer;
+    padStrings += std::to_string(attendees.size());
     padStrings += " ";
     std::vector<cogaEmotionalAttendee*>::iterator iter_ea;
     //const char* pEmoMlStr;
@@ -1158,10 +1156,9 @@ std::string WASABIQtWindow::buildAffectedLikelihoodStrings(vector<cogaEmotionalA
         ui->textEditOut->append(QString("(%0) %1: %2").arg(QTime::currentTime().toString())
                             .arg(ea->getName().c_str())
                             .arg(padString.c_str()));
-        //padStrings += std::to_string(ea->getLocalID());
-        itoa(ea->getLocalID(), buffer, 10);
+        
         padStrings += "ID";
-        padStrings += buffer;
+        padStrings += std::to_string(ea->getLocalID());
 
         stringstream padValues;
         padValues << " P=" << ea->getPValue() << " A=" << ea->getAValue() << " D=" << ea->getDValue();
