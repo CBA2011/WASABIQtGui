@@ -8,7 +8,7 @@
 #QMAKEFEATURES += $$_PRO_FILE_PWD_/WASABI-qwt-clone/qwt-code/qwt
 #QMAKEFEATURES += $$_PRO_FILE_PWD_/WASABIEngine
 QT       += core gui opengl network xml
-CONFIG += qwt
+CONFIG += qwt c++11
 
 TARGET = WASABIGuiQt
 TEMPLATE = app
@@ -19,10 +19,18 @@ INCLUDEPATH +=  $$_PRO_FILE_PWD_/WASABI-qwt-clone/qwt-code/qwt/src
 CONFIG(release, debug|release) {
     win32-g++:LIBS += -L"$$_PRO_FILE_PWD_/build-WASABIEngine/release" -lWASABIEngine
     win32-g++:LIBS += -L"$$_PRO_FILE_PWD_/WASABI-qwt-clone/qwt-code/qwt/lib" -lqwt
+
+    # On Mac, the debug and release folders are not automatically created
+    macx:LIBS += -L"$$_PRO_FILE_PWD_/build-WASABIEngine" -lWASABIEngine
+    macx:LIBS += -L"$$_PRO_FILE_PWD_/WASABI-qwt-clone/qwt-code/qwt/lib" -lqwt
 }
 CONFIG(debug, debug|release) {
     win32-g++:LIBS += -L"$$_PRO_FILE_PWD_/build-WASABIEngine/debug" -lWASABIEngine
     win32-g++:LIBS += -L"$$_PRO_FILE_PWD_/WASABI-qwt-clone/qwt-code/qwt/lib" -lqwtd
+
+    # On Mac, the debug and release folders are not automatically created
+    macx:LIBS += -L"$$_PRO_FILE_PWD_/build-WASABIEngine" -lWASABIEngine
+    macx:LIBS += -L"$$_PRO_FILE_PWD_/WASABI-qwt-clone/qwt-code/qwt/lib" -lqwt
 }
 # win32-g++:LIBS += -L"$$_PRO_FILE_PWD_/WASABI-qwt-clone/qwt-code/qwt/lib" -lqwtmathml
 #win32-g++:LIBS += -lWASABIEngine
