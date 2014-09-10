@@ -1,0 +1,10 @@
+# Ignore os-specific files
+.DS_Store
+
+# Ignore the submodule directories
+WASABI-qwt-clone/
+WASABIEngine/
+
+# Ignore qt-files and folders
+*.user
+build-*/
