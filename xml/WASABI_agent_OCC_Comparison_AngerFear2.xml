@@ -1,0 +1,48 @@
+<emotionml version="1.0" xmlns="http://www.w3.org/2009/10/emotionml"
+	xmlns:wasabi="http://www.becker-asano.de/WASABI/Shema/WASABI"
+	dimension-set="http://www.w3.org/TR/emotion-voc/xml#pad-dimensions"
+	xmlns:xsi="http://www.w3.org/2009/10/emotionml"
+	xsi:noNamespaceSchemaLocation="emotionml.xsd">
+	<info>
+		<!-- 
+		These values for emotion dynamcis are taken from Listing 6.1 on page 141 of CBA'S thesis published in 2008. They can be considered the default values for WASABI. 
+		-->
+		<wasabi:parameter type="dynamic" name="xTens" value="10"/>
+		<wasabi:parameter type="dynamic" name="yTens" value="3"/>
+		<wasabi:parameter type="dynamic" name="slope" value="500"/>
+		<wasabi:parameter type="dynamic" name="mass" value="5000"/>
+		<wasabi:parameter type="dynamic" name="xReg" value="1"/>
+		<wasabi:parameter type="dynamic" name="yReg" value="1"/>
+		<wasabi:parameter type="dynamic" name="boredom" value="50"/>
+		<wasabi:parameter type="dynamic" name="prevalence" value="0"/>
+	</info>
+	<!-- NOTE: EmotionML forbids the use of negative values so that the P A D values have to be in the range [0, 1] as well with 0 resulting in -100 and 1 matching 100.-->
+	<emotion id="angry" category-set="http://www.w3.org/TR/emotion-voc/xml#fsre-categories">
+		<category name="angry"/>
+		<dimension name="pleasure" value="0.1"/>
+		<dimension name="arousal" value="0.9"/>
+		<dimension name="dominance" value="1.0"/>
+		<info>
+			<wasabi:primary>
+				<wasabi:parameter name="base_intensity" value="0.75"/>
+				<wasabi:parameter name="act_threshold" value="0.64"/>
+				<wasabi:parameter name="sat_threshold" value="0.2"/>
+				<wasabi:parameter name="decay" value="linear"/>
+			</wasabi:primary>
+		</info>
+	</emotion>
+	<emotion id="fear" category-set="http://www.w3.org/TR/emotion-voc/xml#fsre-categories">
+		<category name="fear"/>
+		<dimension name="pleasure" value="0.1"/>
+		<dimension name="arousal" value="0.9"/>
+		<dimension name="dominance" value="0.0"/>
+		<info>
+			<wasabi:primary>
+				<wasabi:parameter name="base_intensity" value="0.25"/>
+				<wasabi:parameter name="act_threshold" value="0.64"/>
+				<wasabi:parameter name="sat_threshold" value="0.2"/>
+				<wasabi:parameter name="decay" value="linear"/>
+			</wasabi:primary>
+		</info>
+	</emotion>
+</emotionml>
