@@ -73,14 +73,14 @@ Please also check this https://help.github.com/articles/set-up-git page.
 
 # Additional information
 To get additional information about WASABI, reading my PhD thesis might be helpful.
-> @phdthesis{
->   author = {Becker-Asano, Christian},
->   title = {WASABI: Affect Simulation for Agents with Believable Interactivity},
->   school = {Faculty of Technology, University of Bielefeld},
->   year = {2008},
->   note = {IOS Press (DISKI 319)},
->   url = {http://www.becker-asano.de/Becker-Asano_WASABI_Thesis.pdf}
-> }
+@phdthesis{
+  author = {Becker-Asano, Christian},
+  title = {WASABI: Affect Simulation for Agents with Believable Interactivity},
+  school = {Faculty of Technology, University of Bielefeld},
+  year = {2008},
+  note = {IOS Press (DISKI 319)},
+  url = {http://www.becker-asano.de/Becker-Asano_WASABI_Thesis.pdf}
+}
 
 Anyway, please feel free to contact me.
 
