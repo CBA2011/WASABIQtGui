@@ -24,7 +24,7 @@
 ********************************************************************************/
 #ifndef WASABIQTWINDOW_H
 #define WASABIQTWINDOW_H
-#define CURRENT_VERSION "0.7a"
+#define CURRENT_VERSION "0.8"
 
 #include <QMainWindow>
 #include "WASABIEngine.h"
