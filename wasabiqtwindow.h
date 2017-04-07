@@ -43,7 +43,6 @@ namespace Ui {
 
 class PADWindow;
 class QUdpSocket;
-class WASABIqwtPlotter;
 
 class WASABIQtWindow : public QMainWindow
 {
@@ -67,12 +66,10 @@ public:
     std::string composeEmoML(cogaEmotionalAttendee* ea);
     std::string EmoMLString;
     void setPADspace(bool state);
-    void setQWT(bool state);
 
 public slots:
     void actionAbout();
     void actionPAD_space();
-    void actionPlot();
 
 private slots:
     void on_spinBoxForceX_valueChanged(int arg1);
@@ -129,8 +126,6 @@ private slots:
 
 private:
     PADWindow *padWindow;
-    WASABIqwtPlotter* qwtPlotterWindow;
-    //WASABIqwtPlotter *qwtPlotterWindow;
     Ui::WASABIQtWindow *ui;
     void comboBoxAttendee_update();
     void initValues(cogaEmotionalAttendee* ea);

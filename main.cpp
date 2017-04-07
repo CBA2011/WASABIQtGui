@@ -24,7 +24,6 @@
 ********************************************************************************/
 #include <qapplication.h>
 #include "wasabiqtwindow.h"
-#include "wasabiqwtplotter.h"
 
 int main(int argc, char *argv[])
 {

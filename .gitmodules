@@ -2,6 +2,3 @@
 	path = WASABIEngine
 	url = https://github.com/CBA2011/WASABIEngine.git
 	branch = master
-[submodule "WASABI-qwt-clone"]
-	path = WASABI-qwt-clone
-	url = https://github.com/Becker-Asano/WASABI-qwt-clone.git

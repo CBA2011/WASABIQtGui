@@ -25,7 +25,6 @@
 #include "wasabiqtwindow.h"
 #include "ui_wasabiqtwindow.h"
 #include "padwindow.h"
-#include "wasabiqwtplotter.h"
 #include "PrimaryEmotion.h"
 #include "SecondaryEmotion.h"
 #include <sstream>
@@ -112,12 +111,6 @@ WASABIQtWindow::WASABIQtWindow(QWidget *parent) :
     QDir dir;
     qDebug() << "Hello World " << dir.currentPath();
     sPort = 42424;
-
-    // Create the qwt-based plotter window
-    qwtPlotterWindow = new WASABIqwtPlotter(this, wasabi);
-    qwtPlotterWindow->resize(qwtPlotterWindow->sizeHint());
-    // The plotter is under construction
-    //qwtPlotterWindow->show();
 
     // Create the pad space OpenGL-window
     padWindow = new PADWindow(this, this);
@@ -1297,7 +1290,7 @@ void WASABIQtWindow::on_checkBoxSending_stateChanged(int arg1)
 
 void WASABIQtWindow::actionAbout() {
     QMessageBox* about;
-    about = new QMessageBox(QMessageBox::Information, "About WASABIQtGUI", QString("<p>Copyright (C) 2011 Christian Becker-Asano. <br>All rights reserved.<br>Contact: Christian Becker-Asano (christian@becker-asano.de)</p>This is version %0 of the Qt5-based Graphical User Interface (GUI) WASABIQtGUI, which depends on the shared libraries WASABIEngine and qwt (included as submodules) to run the WASABI Affect Simulation Architecture as described in the doctoral thesis of Christian Becker-Asano. It is licensed under the LGPL and its source can be obtained freely via GitHub.<p>For further information, please visit:<br> <a href='https://www.becker-asano.de/index.php/component/search/?searchword=WASABI'>https://www.becker-asano.de/index.php/component/search/?searchword=WASABI</a></p>").arg(CURRENT_VERSION), QMessageBox::Ok);
+    about = new QMessageBox(QMessageBox::Information, "About WASABIQtGUI", QString("<p>Copyright (C) 2011 Christian Becker-Asano. <br>All rights reserved.<br>Contact: Christian Becker-Asano (christian@becker-asano.de)</p>This is version %0 of the Qt5-based Graphical User Interface (GUI) WASABIQtGUI, which depends on the shared librarie WASABIEngine to run the WASABI Affect Simulation Architecture as described in the doctoral thesis of Christian Becker-Asano. It is licensed under the LGPL and its source can be obtained freely via GitHub.<p>For further information, please visit:<br> <a href='https://www.becker-asano.de/index.php/component/search/?searchword=WASABI'>https://www.becker-asano.de/index.php/component/search/?searchword=WASABI</a></p>").arg(CURRENT_VERSION), QMessageBox::Ok);
     about->setTextFormat(Qt::RichText);
     about->show();
 }
@@ -1308,15 +1301,6 @@ void WASABIQtWindow::actionPAD_space() {
     }
     else {
         padWindow->hide();
-    }
-}
-
-void WASABIQtWindow::actionPlot() {
-    if (ui->actionPlot->isChecked()) {
-        qwtPlotterWindow->show();
-    }
-    else {
-        qwtPlotterWindow->hide();
     }
 }
 
@@ -1359,11 +1343,6 @@ void WASABIQtWindow::on_pushButton_network_send_clicked()
 void WASABIQtWindow::setPADspace(bool state)
 {
     ui->actionPAD_space->setChecked(state);
-}
-
-void WASABIQtWindow::setQWT(bool state)
-{
-    ui->actionPlot->setChecked(state);
 }
 
 /*!

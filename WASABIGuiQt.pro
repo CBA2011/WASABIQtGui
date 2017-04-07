@@ -7,30 +7,25 @@
 #include($$_PRO_FILE_PWD_/WASABI-qwt-clone/qwt-code/qwt/qwtconfig.pri)
 #QMAKEFEATURES += $$_PRO_FILE_PWD_/WASABI-qwt-clone/qwt-code/qwt
 #QMAKEFEATURES += $$_PRO_FILE_PWD_/WASABIEngine
-QT       += core gui opengl network xml
-CONFIG += qwt c++11
+QT       += core gui opengl network xml widgets
+CONFIG += c++11
 
 TARGET = WASABIGuiQt
 TEMPLATE = app
 
-DEPENDPATH += . $$_PRO_FILE_PWD_/WASABIEngine $$_PRO_FILE_PWD_/WASABI-qwt-clone/qwt-code/qwt
+DEPENDPATH += . $$_PRO_FILE_PWD_/WASABIEngine
 INCLUDEPATH +=  $$_PRO_FILE_PWD_/WASABIEngine
-INCLUDEPATH +=  $$_PRO_FILE_PWD_/WASABI-qwt-clone/qwt-code/qwt/src
 CONFIG(release, debug|release) {
-    win32-g++:LIBS += -L"$$_PRO_FILE_PWD_/build-WASABIEngine/release" -lWASABIEngine
-    win32-g++:LIBS += -L"$$_PRO_FILE_PWD_/WASABI-qwt-clone/qwt-code/qwt/lib" -lqwt
+    win32-g++:LIBS += -L"$$_PRO_FILE_PWD_/build-WASABIEngine/release" -lWASABIEngine -lopengl32 -lglu32
 
     # On Mac, the debug and release folders are not automatically created
-    macx:LIBS += -L"$$_PRO_FILE_PWD_/build-WASABIEngine" -lWASABIEngine
-    macx:LIBS += -L"$$_PRO_FILE_PWD_/WASABI-qwt-clone/qwt-code/qwt/lib" -lqwt
+    macx:LIBS += -L"$$_PRO_FILE_PWD_/build-WASABIEngine" -lWASABIEngine -lopengl32 -lglu32
 }
 CONFIG(debug, debug|release) {
-    win32-g++:LIBS += -L"$$_PRO_FILE_PWD_/build-WASABIEngine/debug" -lWASABIEngine
-    win32-g++:LIBS += -L"$$_PRO_FILE_PWD_/WASABI-qwt-clone/qwt-code/qwt/lib" -lqwtd
+    win32-g++:LIBS += -L"$$_PRO_FILE_PWD_/build-WASABIEngine/debug" -lWASABIEngine -lopengl32 -lglu32
 
     # On Mac, the debug and release folders are not automatically created
-    macx:LIBS += -L"$$_PRO_FILE_PWD_/build-WASABIEngine" -lWASABIEngine
-    macx:LIBS += -L"$$_PRO_FILE_PWD_/WASABI-qwt-clone/qwt-code/qwt/lib" -lqwt
+    macx:LIBS += -L"$$_PRO_FILE_PWD_/build-WASABIEngine" -lWASABIEngine -lopengl32 -lglu32
 }
 # win32-g++:LIBS += -L"$$_PRO_FILE_PWD_/WASABI-qwt-clone/qwt-code/qwt/lib" -lqwtmathml
 #win32-g++:LIBS += -lWASABIEngine
@@ -43,13 +38,13 @@ SOURCES += main.cpp\
         wasabiqtwindow.cpp \
     padwindow.cpp \
     glPADWidget.cpp \
-    wasabiqwtplotter.cpp
+#    wasabiqwtplotter.cpp
 
 HEADERS  += \
     padwindow.h \
     glPADWidget.h \
-    wasabiqtwindow.h \
-    wasabiqwtplotter.h
+    wasabiqtwindow.h #\
+#    wasabiqwtplotter.h
 
 FORMS    += wasabiqtwindow.ui
 
@@ -61,6 +56,8 @@ OTHER_FILES += \
     hope.se \
     fears-confirmed.se \
     Becker-Asano.emo_pad \
-    Becker-Asano.emo_dyn \
-    README.txt
+    Becker-Asano.emo_dyn
+
+DISTFILES += \
+    README.md
 
