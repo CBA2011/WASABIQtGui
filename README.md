@@ -21,8 +21,6 @@ Contact: Christian Becker-Asano (christian (at) becker-asano (dot) de)
 
 `$ git submodule update --init "WASABIEngine"`
 
-`$ git submodule update --init "WASABI-qwt-clone"`
-
 2. Compiling
 
     Instructions for the qt-project.org-Version of Qt5 (UPDATED 22nd of October, 2013, and again on April 7, 2017):
