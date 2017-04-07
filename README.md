@@ -18,7 +18,9 @@ Contact: Christian Becker-Asano (christian (at) becker-asano (dot) de)
     It depends on Qt, OpenGL, and the WASABIEngine as dynamically linked libraries. The first two come with the Qt SDK. The last one is integrated as submodules.
 
     After a fresh clone of this project or after the first "Pull" that updates your local repo to the submodule version, you will only have the empty subdirectories "WASABIEngine" and "WASABI-qwt-clone" and compiling will fail. Thus, perform:
+
 `$ git submodule update --init "WASABIEngine"`
+
 `$ git submodule update --init "WASABI-qwt-clone"`
 
 2. Compiling
