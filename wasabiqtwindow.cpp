@@ -185,7 +185,6 @@ WASABIQtWindow::WASABIQtWindow(QWidget *parent) :
     ui->lineEditReceiverPort->setText(str);
     connect(ui->actionAbout, SIGNAL(triggered()), SLOT(actionAbout()) );
     connect(ui->actionPAD_space, SIGNAL(triggered()), SLOT(actionPAD_space()) );
-    connect(ui->actionPlot, SIGNAL(triggered()), SLOT(actionPlot()) );
 }
 
 WASABIQtWindow::~WASABIQtWindow()
