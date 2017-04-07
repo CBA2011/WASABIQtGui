@@ -18,6 +18,7 @@ After a fresh clone of this project or after the first "Pull" that updates your 
 `$ git submodule update --init "WASABIEngine"`
 
 2. Compiling
+
     Instructions for the qt-project.org-Version of Qt5 (UPDATED 22nd of October, 2013, and again on April 7, 2017):
 * Open the file "WASABIGuiQt.pro" by double clicking on it.
 * use the default configuration for "Desktop Qt 5.8.0 MinGW 32bit" with two seperate directories for "Debug" and "Release".
@@ -27,8 +28,7 @@ After a fresh clone of this project or after the first "Pull" that updates your 
 - Change both build-paths for debug and release to:
   `<path\to\git-working-dir>\WASABIQtGui\build-WASABIEngine`
   The WASABIEngine builds will then reside in the (newly created) subdirectories "debug" and "release".
-- Change to "Debug" mode on the left panel (the Computer screen button), and hit "build" (the hammer button).
-  This should result in the file "../build-WASABIEngine/debug/WASABIEngine.dll". Similarly, you may try to build the release version.
+- Change to "Debug" mode on the left panel (the Computer screen button), and hit "build" (the hammer button). This should result in the file "../build-WASABIEngine/debug/WASABIEngine.dll". Similarly, you may try to build the release version.
 * Finally, make the WASABIGuiQt project the active project by right-clicking on it in the "Projects" pane and selecting the corresponding option.
 
 3. Running
@@ -47,11 +47,11 @@ Take a look at the WASABIGuiQt.pro file, if you run into trouble.
 # Notes on Linux environments
 
 TODO: needs to be updated..
-In case of a linux environment, I found that the "WASABIGuiQt" executable seems to expect the WASABIEngine library in "/usr/lib" (as the output of "ldd WASABIGuiQt" told me). Thus, after manually copying the library (together with the symbolic links, "sudo cp lib* /usr/lib") to that folder, the Gui runs fine. Sorry for this inconvenience. If anybody nows how to automate/fix this, please let me now.
-
+In case of a linux environment, I found that the "WASABIGuiQt" executable seems to expect the WASABIEngine library in `/usr/lib` (as the output of `ldd WASABIGuiQt` told me). Thus, after manually copying the library (together with the symbolic links, `sudo cp lib* /usr/lib`) to that folder, the Gui runs fine.
+Sorry for this inconvenience. If anybody knows how to automate/fix this, please let me now.
 # Documentation
 I used doxygen to compile an html documentation from the source code. It can be found in
-"WASABIEngine\doxygen\html".
+`WASABIEngine\doxygen\html`.
 
 # Using git to commit (locally) and push (to global repository):
 Recently, TortoiseGit started to ask me for my login credentials, which was not the case so far. To fix this, proceed as follows:
